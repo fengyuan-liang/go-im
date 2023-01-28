@@ -100,7 +100,7 @@ func (d *GormFormMySQLDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
 		configStruct.Db.Mysql.PASSWORD,
 		configStruct.Db.Mysql.URL,
 		configStruct.Db.Mysql.PORT,
-		configStruct.Db.Mysql.DRIVER_NAME)
+		configStruct.Db.Mysql.DB_NAME)
 	var err error
 	gormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

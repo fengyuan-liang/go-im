@@ -16,8 +16,9 @@ type ConfigStruct struct {
 
 // DBConfig 映射yml配置文件结构体
 type DBConfig struct {
-	Mysql   BaseDBStruct `yaml: "mysql"`
-	MongoDb BaseDBStruct `yaml: "mongodb"`
+	// 如果
+	Mysql   BaseDBStruct `yaml:"mysql"`
+	MongoDb BaseDBStruct `yaml:"mongodb"`
 }
 
 type BaseDBStruct struct {
