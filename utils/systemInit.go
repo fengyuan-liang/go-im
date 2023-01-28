@@ -13,6 +13,10 @@ import (
 
 var vip *viper.Viper
 
+func init() {
+	InitConfig()
+}
+
 // InitConfig 读取config.yml中的配置文件
 func InitConfig() *viper.Viper {
 	//获取项目的执行路径

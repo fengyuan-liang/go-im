@@ -11,6 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
+	"os"
 	"time"
 )
 
@@ -102,7 +105,38 @@ func (d *GormFormMySQLDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
 		configStruct.Db.Mysql.PORT,
 		configStruct.Db.Mysql.DB_NAME)
 	var err error
-	gormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// 自定义sql日志模版参数
+	newLogConfig := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel: func() logger.LogLevel {
+				switch configStruct.Db.Mysql.LogLevel {
+				case "Info":
+					fallthrough
+				case "info":
+					return logger.Info
+				case "Warn":
+					fallthrough
+				case "warn":
+					return logger.Warn
+				case "Error":
+					fallthrough
+				case "error":
+					return logger.Error
+				case "Silent":
+					fallthrough
+				case "silent":
+					return logger.Silent
+				default:
+					return logger.Info
+				}
+			}(),
+			Colorful: configStruct.Db.Mysql.Colorful,
+		},
+	)
+	// 自定义日志模版
+	gormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogConfig})
 	if err != nil {
 		return nil, bizError.NewBizError("数据库连接建立失败，错误信息为：", err.Error())
 	}

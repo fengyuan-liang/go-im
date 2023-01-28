@@ -5,6 +5,12 @@ db:
     URL: "volunteer.fengxianhub.top"
     PORT: 20062
     DB_NAME: "gin_chat"
+    # 慢sql阈值，单位毫秒
+    SlowThreshold: 100
+    # 日志打印级别
+    LogLevel: info
+    # 是否彩色打印sql
+    Colorful: true
   mongodb:
     USER_NAME: "root"
     PASSWORD: 123456

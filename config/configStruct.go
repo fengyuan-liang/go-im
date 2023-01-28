@@ -11,7 +11,7 @@ import (
 
 // ConfigStruct 配置文件映射实体类
 type ConfigStruct struct {
-	Db DBConfig `yaml: "db"`
+	Db DBConfig `yaml:"db"`
 }
 
 // DBConfig 映射yml配置文件结构体
@@ -22,12 +22,15 @@ type DBConfig struct {
 }
 
 type BaseDBStruct struct {
-	DRIVER_NAME string `yaml:"DRIVER_NAME"`
-	USER_NAME   string `yaml:"USER_NAME"`
-	PASSWORD    string `yaml:"PASSWORD"`
-	URL         string `yaml:"URL"`
-	PORT        string `yaml:"PORT"`
-	DB_NAME     string `yaml:"DB_NAME"`
+	DRIVER_NAME   string `yaml:"DRIVER_NAME"`
+	USER_NAME     string `yaml:"USER_NAME"`
+	PASSWORD      string `yaml:"PASSWORD"`
+	URL           string `yaml:"URL"`
+	PORT          string `yaml:"PORT"`
+	DB_NAME       string `yaml:"DB_NAME"`
+	SlowThreshold int    `yaml:"SlowThreshold"` // 慢sql阈值，单位毫秒
+	LogLevel      string `yaml:"LogLevel"`      // 日志打印级别 例如info error
+	Colorful      bool   `yaml:"Colorful"`      // 是否彩色打印sql
 }
 
 // GetDbInfo 获取config下`db`的配置

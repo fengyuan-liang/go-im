@@ -1,0 +1,30 @@
+info:
+  contact: {}
+  title: Swagger Example API
+paths:
+  /user/pageQuery:
+    get:
+      parameters:
+      - default: 1
+        description: 第几页
+        in: query
+        name: pageNo
+        required: true
+        type: integer
+      - default: 10
+        description: 每页多少条
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: UserBasic
+      summary: 分页查询
+      tags:
+      - 用户相关
+swagger: "2.0"
