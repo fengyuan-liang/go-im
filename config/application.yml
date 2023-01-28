@@ -1,14 +1,14 @@
 db:
   mysql:
-    USER_NAME   = "root"
-    PASSWORD    = 123456
-    URL         = "volunteer.fengxianhub.top"
-    PORT        = 20062
-    DB_NAME     = "gin_chat"
+    USER_NAME: "root"
+    PASSWORD: 123456
+    URL: "volunteer.fengxianhub.top"
+    PORT: 20062
+    DB_NAME: "gin_chat"
   mongodb:
-    USER_NAME   = "root"
-    PASSWORD    = 123456
-    URL         = "volunteer.fengxianhub.top"
-    PORT        = 20062
-    DB_NAME     = "gin_chat"
+    USER_NAME: "root"
+    PASSWORD: 123456
+    URL: "volunteer.fengxianhub.top"
+    PORT: 20062
+    DB_NAME: "gin_chat"
 

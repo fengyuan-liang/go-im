@@ -1,7 +1,9 @@
 package main
 
 import (
-	"go-im/utils"
+	"fmt"
+	"go-im/common/driverUtil"
+	"go-im/models"
 )
 
 // @Description: 启动类
@@ -9,12 +11,10 @@ import (
 // @Date: 2023/01/27 20:58
 // @Author: fengyuan-liang@foxmail.com
 func main() {
-	// 读取配置文件
-	utils.InitConfig()
-	//driver, _ := driverUtil.InitGormDriver()
-	//user := models.UserBasic{}
-	//driver.Find(&user)
-	//fmt.Println(user)
+	driver, _ := driverUtil.GetGormDriver(&driverUtil.GormFormMySQLDriver{})
+	user := models.UserBasic{}
+	driver.Find(&user)
+	fmt.Println(user)
 	//// 路由
 	//r := router.Router()
 	//// 监听端口
