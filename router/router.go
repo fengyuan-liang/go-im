@@ -28,7 +28,8 @@ func Router() *gin.Engine {
 	// 路由组1 ，处理用户相关GET请求
 	u1 := r.Group("user/")
 	{
-		u1.GET("pageQuery", service.PageQueryUserList)
+		u1.GET("/pageQuery", service.PageQueryUserList)
+		u1.POST("/register", service.CreateUser)
 	}
 	return r
 }

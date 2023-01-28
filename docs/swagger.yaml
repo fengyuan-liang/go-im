@@ -1,3 +1,6 @@
+definitions:
+  models.UserBasic:
+    type: object
 info:
   contact: {}
   title: Swagger Example API
@@ -27,4 +30,23 @@ paths:
       summary: 分页查询
       tags:
       - 用户相关
+  /user/register:
+    post:
+      parameters:
+      - description: 上传的JSON
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserBasic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: UserBasic
+      summary: 用于用户注册
+      tags:
+      - 创建一个用户
 swagger: "2.0"

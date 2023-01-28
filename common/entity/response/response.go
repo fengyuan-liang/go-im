@@ -11,8 +11,9 @@ import (
 // @Author: fengyuan-liang@foxmail.com
 
 var (
-	Ok  = New(200, "操作成功")
-	Err = New(500, "操作失败")
+	Ok     = New(200, "操作成功")
+	Err    = New(500, "操作失败")
+	AppErr = New(-1, "请求异常")
 )
 
 type Reply struct {

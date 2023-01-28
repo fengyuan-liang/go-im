@@ -104,7 +104,6 @@ func (d *GormFormMySQLDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
 		configStruct.Db.Mysql.URL,
 		configStruct.Db.Mysql.PORT,
 		configStruct.Db.Mysql.DB_NAME)
-	var err error
 	// 自定义sql日志模版参数
 	newLogConfig := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -135,6 +134,7 @@ func (d *GormFormMySQLDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
 			Colorful: configStruct.Db.Mysql.Colorful,
 		},
 	)
+	var err error
 	// 自定义日志模版
 	gormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogConfig})
 	if err != nil {

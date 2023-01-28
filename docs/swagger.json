@@ -41,6 +41,41 @@
                     }
                 }
             }
+        },
+        "/user/register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "创建一个用户"
+                ],
+                "summary": "用于用户注册",
+                "parameters": [
+                    {
+                        "description": "上传的JSON",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserBasic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "UserBasic"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.UserBasic": {
+            "type": "object"
         }
     }
 }
