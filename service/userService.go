@@ -111,7 +111,7 @@ func CreateUser(c *gin.Context) {
 // DelOne 删除一个用户
 // @Tags 删除一个用户
 // @Summary 参数类型：{"userId":123456,"isLogicDel":true}
-// @Param param body string  true "上传的JSON"
+// @Param param body models.UserBasic true "上传的JSON"
 // @Produce json
 // @Success 200 {UserBasic} []*UserBasic
 // @Router /user/delOne [post]
@@ -131,14 +131,18 @@ func DelOne(c *gin.Context) {
 
 // Update 更新用户信息
 // @Tags 更新用户信息
+// @Param param body models.UserBasic true "上传的JSON"
 // @Produce json
-// @Router /user/delOne [post]
+// @Router /user/update [post]
 func Update(c *gin.Context) {
-	jsonMap := make(map[string]interface{}) //注意该结构接受的内容
-	if err := c.BindJSON(&jsonMap); err != nil || len(jsonMap) <= 0 {
+	jsonMap := make(map[string]interface{}) // 注意该结构接受的内容
+	userBasic := models.UserBasic{}
+	if err := c.BindJSON(&userBasic); err != nil || len(jsonMap) <= 0 || jsonMap["userId"] == nil {
 		c.JSON(500, response.Err.WithMsg("参数缺失"))
 		return
 	}
+	// 不能直接用 map[string]interface{}解析，因为int会范化为float，更新会失败，必须要确定类型
+
 	// TODO 从token中拿到userId
 	var userId = uint64(utils.ParseInt(jsonMap["userId"]))
 	models.Update(userId, func(tx *gorm.DB) {

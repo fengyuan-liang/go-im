@@ -18,3 +18,9 @@ func GetAllQueryParams(c *gin.Context) map[string]interface{} {
 	}
 	return queryMap
 }
+
+// ParseMapFieldTypeByBean 根据bean的类型将jsonMap value类型转换
+func ParseMapFieldTypeByBean(jsonMap map[string]interface{}, bean *struct{}) {
+	// 拿到结构体所有属性的类型
+
+}

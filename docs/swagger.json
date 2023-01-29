@@ -11,9 +11,28 @@
                     "application/json"
                 ],
                 "tags": [
-                    "更新用户信息"
+                    "删除一个用户"
                 ],
-                "responses": {}
+                "summary": "参数类型：{\"userId\":123456,\"isLogicDel\":true}",
+                "parameters": [
+                    {
+                        "description": "上传的JSON",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserBasic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "UserBasic"
+                        }
+                    }
+                }
             }
         },
         "/user/pageQuery": {
@@ -100,6 +119,28 @@
                         }
                     }
                 }
+            }
+        },
+        "/user/update": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "更新用户信息"
+                ],
+                "parameters": [
+                    {
+                        "description": "上传的JSON",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserBasic"
+                        }
+                    }
+                ],
+                "responses": {}
             }
         }
     },

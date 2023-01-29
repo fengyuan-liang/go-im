@@ -7,11 +7,23 @@ info:
 paths:
   /user/delOne:
     post:
+      parameters:
+      - description: 上传的JSON
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserBasic'
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: UserBasic
+      summary: 参数类型：{"userId":123456,"isLogicDel":true}
       tags:
-      - 更新用户信息
+      - 删除一个用户
   /user/pageQuery:
     get:
       parameters:
@@ -68,4 +80,18 @@ paths:
       summary: 用于用户注册
       tags:
       - 创建一个用户
+  /user/update:
+    post:
+      parameters:
+      - description: 上传的JSON
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserBasic'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - 更新用户信息
 swagger: "2.0"

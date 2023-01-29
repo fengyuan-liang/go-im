@@ -37,6 +37,7 @@ func Router() *gin.Engine {
 		{
 			u1.POST("/register", service.CreateUser)
 			u1.POST("/delOne", service.DelOne)
+			u1.POST("/update", service.Update)
 		}
 	}
 	return r

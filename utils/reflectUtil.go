@@ -49,3 +49,15 @@ func CopyStruct(dst, src interface{}) {
 		}
 	}
 }
+
+// GetFieldStringType 反射获取结构体属性和其类型
+// 注意这里返回的一般是大写，比较请使用`strings.EqualFold(x1, x2)`忽略大小写进行比较
+func GetFieldStringType(bean *struct{}) map[string]string {
+	typ := reflect.TypeOf(bean)
+	m := make(map[string]string)
+	for i := 0; i < typ.NumField(); i++ {
+		structFieldType := typ.Field(i)
+		m[structFieldType.Name] = structFieldType.Type.String()
+	}
+	return m
+}
