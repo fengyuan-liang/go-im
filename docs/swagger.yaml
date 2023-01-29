@@ -5,6 +5,13 @@ info:
   contact: {}
   title: Swagger Example API
 paths:
+  /user/delOne:
+    post:
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - 更新用户信息
   /user/pageQuery:
     get:
       parameters:
@@ -28,6 +35,18 @@ paths:
           schema:
             type: UserBasic
       summary: 分页查询
+      tags:
+      - 用户相关
+  /user/pageQueryByFilter:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: UserBasic
+      summary: 前端请求参数应为：http://xx:xx/pageQueryByFilter?pageSize=1&pageNo=1&name=1&age=2&email=xxx@xxx
       tags:
       - 用户相关
   /user/register:

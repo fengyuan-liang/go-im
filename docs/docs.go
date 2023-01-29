@@ -15,6 +15,17 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/user/delOne": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "更新用户信息"
+                ],
+                "responses": {}
+            }
+        },
         "/user/pageQuery": {
             "get": {
                 "produces": [
@@ -42,6 +53,25 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "UserBasic"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/pageQueryByFilter": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关"
+                ],
+                "summary": "前端请求参数应为：http://xx:xx/pageQueryByFilter?pageSize=1\u0026pageNo=1\u0026name=1\u0026age=2\u0026email=xxx@xxx",
                 "responses": {
                     "200": {
                         "description": "OK",

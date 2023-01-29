@@ -5,6 +5,7 @@ import (
 	"go-im/sql/daoEntity"
 	"go-im/utils"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 // @Description: 相关实体类
@@ -37,22 +38,48 @@ func (user *UserBasic) TableName() string {
 	return "user_basic"
 }
 
+var localDB *gorm.DB
+
+// getDB 这里可以改成根据配置文件选择数据源
+func getDB() *gorm.DB {
+	if localDB == nil {
+		localDB, _ = driverUtil.GetGormDriver(&driverUtil.GormFormMySQLDriver{})
+	}
+	return localDB
+}
+
 //===================== 查询相关 ==========================
 
 // PageQueryUserList 分页查询
 func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
-	db, _ := driverUtil.GetGormDriver(&driverUtil.GormFormMySQLDriver{})
+	db := getDB()
 	// 初始化容器
 	userBasicList := make([]*UserBasic, pageSize)
 	db.Scopes(daoEntity.Paginate(pageNo, pageSize)).Find(&userBasicList)
 	return userBasicList
 }
 
+// PageQueryByFilter 根据过滤条件进行分页查询。可以使用
+// pageNo 第几页
+func PageQueryByFilter(pageNo int, pageSize int, filter func(*gorm.DB)) []*UserBasic {
+	db := getDB()
+	// 初始化容器
+	tx := db.Scopes(daoEntity.Paginate(pageNo, pageSize))
+	// 执行回调函数
+	if filter != nil {
+		filter(tx)
+	}
+	// 初始化容器
+	userBasicList := make([]*UserBasic, pageSize)
+	tx.Find(&userBasicList)
+	return userBasicList
+}
+
 //===================== 插入相关 ==========================
 
 // InsetOne 插入相关，需要防止并发情况和集群情况插入多次的问题TODO
-func InsetOne(basic UserBasic) (tx *gorm.DB) {
-	db, _ := driverUtil.GetGormDriver(&driverUtil.GormFormMySQLDriver{})
+func InsetOne(basic *UserBasic) (tx *gorm.DB) {
+	db := getDB()
 END:
 	// 生成`userId`，必须全局唯一
 	var cnt = 0
@@ -63,5 +90,50 @@ END:
 		goto END
 	}
 	basic.UserId = userId
-	return db.Create(&basic)
+END2:
+	// 生成`userNumber` 全局唯一
+	var userNumber = strconv.FormatUint(utils.GetRandomUserId(), 10)
+	db.Raw("select count(1) from ? where user_number = ? limit 1", basic.TableName(), userNumber).Scan(&cnt)
+	// 已经存在了，重新生成
+	if cnt >= 1 {
+		goto END2
+	}
+	basic.UserNumber = userNumber
+	return db.Create(basic)
+}
+
+// ===================== 更新相关相关 ======================
+
+// Update 更新
+func Update(userId uint64, callback func(tx *gorm.DB)) {
+	db := getDB()
+	tx := db.Model(&UserBasic{}).Where("user_id = ?", userId)
+	// 执行回调，传入更新的值
+	callback(tx)
+}
+
+//===================== 删除相关 ==========================
+
+func LogicDelOne(userId uint64) {
+	DelOneByUserId(userId, true)
+}
+
+func RealDelOne(userId uint64) {
+	DelOneByUserId(userId, false)
+}
+
+// DelOneByUserId 删除一条数据
+//
+// @params  userId 用户id
+//
+// @params  isLogicDel 是否逻辑删除
+func DelOneByUserId(userId uint64, isLogicDel bool) {
+	db := getDB()
+	if isLogicDel {
+		// 逻辑删除，将 DeletedAt字段标记为现在的时间
+		db.Where("user_id = ?", userId).Delete(&UserBasic{})
+	} else {
+		// 物理删除
+		db.Unscoped().Where("user_id = ?", userId).Delete(&UserBasic{})
+	}
 }

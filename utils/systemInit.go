@@ -14,6 +14,7 @@ import (
 var vip *viper.Viper
 
 func init() {
+	// 初始化配置文件
 	InitConfig()
 }
 

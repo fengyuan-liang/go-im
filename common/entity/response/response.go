@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// @Description:
+// @Description: 返回参数封装
 // @Version: 1.0.0
 // @Date: 2023/01/28 17:34
 // @Author: fengyuan-liang@foxmail.com
@@ -31,7 +31,7 @@ func New(code int, msg string) *Reply {
 	}
 }
 
-// WithMsg 追加响应消息
+// WithMsg 覆盖响应消息
 func (t *Reply) WithMsg(msg string) Reply {
 	return Reply{
 		Code: t.Code,
@@ -40,7 +40,16 @@ func (t *Reply) WithMsg(msg string) Reply {
 	}
 }
 
-// WithData 追加响应数据
+// AppendMsg 覆盖响应消息
+func (t *Reply) AppendMsg(msg string) Reply {
+	return Reply{
+		Code: t.Code,
+		Msg:  t.Msg + "，错误信息为：【" + msg + "】",
+		Data: t.Data,
+	}
+}
+
+// WithData 覆盖响应数据
 func (t *Reply) WithData(data interface{}) Reply {
 	return Reply{
 		Code: t.Code,
