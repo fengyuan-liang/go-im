@@ -19,7 +19,7 @@ type UserBasic struct {
 	UserId        uint64 `gorm:"column:user_id" json:"userId"`
 	UserNumber    string `gorm:"column:user_number" json:"userNumber"`
 	Name          string `validate:"required" reg_error_info:"姓名不能为空"`
-	Age           uint8  `validate:"lt=0|gt=150" reg_error_info:"年龄不合法"`
+	Age           uint8  `validate:"gt=0,lt=200" reg_error_info:"年龄不合法"`
 	Password      string `gorm:"column:password" json:"password"`
 	PhoneNum      string `validate:"RegexPhone" reg_error_info:"手机号格式不正确"`
 	Email         string `validate:"email" reg_error_info:"email为空或格式不正确"`
