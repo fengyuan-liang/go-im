@@ -136,17 +136,16 @@ func DelOne(c *gin.Context) {
 // @Router /user/update [post]
 func Update(c *gin.Context) {
 	jsonMap := make(map[string]interface{}) // 注意该结构接受的内容
-	userBasic := models.UserBasic{}
-	if err := c.BindJSON(&userBasic); err != nil || len(jsonMap) <= 0 || jsonMap["userId"] == nil {
+	if err := c.BindJSON(&jsonMap); err != nil || len(jsonMap) <= 0 || jsonMap["userId"] == nil {
 		c.JSON(500, response.Err.WithMsg("参数缺失"))
 		return
 	}
 	// 不能直接用 map[string]interface{}解析，因为int会范化为float，更新会失败，必须要确定类型
-
+	parseMap := utils.ParseMapFieldType(jsonMap, models.UserBasic{}, "userId")
 	// TODO 从token中拿到userId
 	var userId = uint64(utils.ParseInt(jsonMap["userId"]))
 	models.Update(userId, func(tx *gorm.DB) {
-		tx.Updates(jsonMap)
+		tx.Updates(parseMap)
 	})
 	c.JSON(200, response.Ok)
 }

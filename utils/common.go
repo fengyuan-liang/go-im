@@ -35,15 +35,65 @@ func ParseString(args interface{}) string {
 	}
 }
 
+func ParseInt64(args interface{}) int64 {
+	return ParseDefaultInt(args, func(str string) (interface{}, error) {
+		return strconv.ParseInt(str, 10, 64)
+	}).(int64)
+}
+
+func ParseInt32(args interface{}) int32 {
+	return int32(ParseInt64(args))
+}
+
+func ParseUint8(args interface{}) uint8 {
+	return uint8(ParseInt64(args))
+}
+
+func ParseUint32(args interface{}) uint32 {
+	return uint32(ParseInt64(args))
+}
+
+func ParseUint64(args interface{}) uint64 {
+	return uint64(ParseInt64(args))
+}
+
 func ParseInt(args interface{}) int {
+	return ParseDefaultInt(args, func(str string) (interface{}, error) {
+		return strconv.Atoi(str)
+	}).(int)
+}
+
+func ParseDefaultInt(args interface{}, callBack func(str string) (interface{}, error)) interface{} {
 	if args == nil {
 		log.Panic("NPE")
 	}
-	intArgs, err := strconv.Atoi(ParseString(args))
+	intArgs, err := callBack(ParseString(args))
 	if err != nil {
 		log.Panicf("类型转换失败，错误信息：%v", err)
 	}
 	return intArgs
+}
+
+// ParseType 将args转为指定的类型【stringType】
+func ParseType(args interface{}, stringType string) (newArgs interface{}) {
+	switch stringType {
+	case "int":
+		return ParseInt(args)
+	case "int32":
+		return ParseInt32(args)
+	case "int64":
+		return ParseInt64(args)
+	case "uint8":
+		return ParseUint8(args)
+	case "uint32":
+		return ParseUint32(args)
+	case "uint64":
+		return ParseUint64(args)
+	case "string":
+		fallthrough
+	default:
+		return ParseString(args)
+	}
 }
 
 //================  string相关  ====================

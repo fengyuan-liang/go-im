@@ -50,14 +50,29 @@ func CopyStruct(dst, src interface{}) {
 	}
 }
 
+// GetLowerTitleFieldStringType 字段名首字母小写
+func GetLowerTitleFieldStringType(bean interface{}) map[string]string {
+	return GetFieldStringType(bean, func(fieldName string) string {
+		return LowerTitle(fieldName)
+	})
+}
+
+// GetDefaultFieldStringType 字段名不做处理，一般为大写
+func GetDefaultFieldStringType(bean interface{}) map[string]string {
+	return GetFieldStringType(bean, func(fieldName string) string {
+		return fieldName
+	})
+}
+
 // GetFieldStringType 反射获取结构体属性和其类型
 // 注意这里返回的一般是大写，比较请使用`strings.EqualFold(x1, x2)`忽略大小写进行比较
-func GetFieldStringType(bean *struct{}) map[string]string {
+func GetFieldStringType(bean interface{}, fun func(fieldName string) string) map[string]string {
 	typ := reflect.TypeOf(bean)
 	m := make(map[string]string)
 	for i := 0; i < typ.NumField(); i++ {
 		structFieldType := typ.Field(i)
-		m[structFieldType.Name] = structFieldType.Type.String()
+		// 执行回调
+		m[fun(structFieldType.Name)] = structFieldType.Type.String()
 	}
 	return m
 }
