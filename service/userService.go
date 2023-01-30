@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go-im/common/entity/response"
 	"go-im/models"
 	"go-im/utils"
@@ -85,15 +86,34 @@ func PageQueryByFilter(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	type UserParams struct {
 		models.UserBasic
-		RePassword string // 第二次输入的密码
+		RePassword string `validate:"eqfield=Password" reg_error_info:"两次密码不一样"`
 	}
 	userParams := &UserParams{}
-	if err := c.BindJSON(userParams); err != nil || userParams.Name == "" || userParams.Age <= 0 || userParams.PassWord == "" {
-		c.JSON(500, response.Err.WithMsg("参数缺失"))
+	if err := c.BindJSON(userParams); err != nil {
+		c.JSON(-1, response.Err.WithMsg("参数有误，err:"+err.Error()))
 		return
 	}
-	if userParams.PassWord != userParams.RePassword {
+	// 参数校验
+	validate := validator.New()
+	// 自定义校验
+	validate.RegisterValidation("RegexPhone", utils.RegexPhone)
+	if err := validate.Struct(userParams); err != nil {
+		c.JSON(-1, response.AppErr.WithMsg(utils.ProcessErr(userParams, err)))
+		return
+	}
+	if userParams.Password != userParams.RePassword {
 		c.JSON(-1, response.AppErr.WithMsg("两次密码不一致"))
+		return
+	}
+	// 检查用户名 电话是否已经存在
+	userByName := models.FindUserByName(userParams.Name)
+	if userByName.Name != "" {
+		c.JSON(-1, response.AppErr.WithMsg("用户名已注册"))
+		return
+	}
+	userByPhone := models.FindUserByName(userParams.PhoneNum)
+	if userByPhone.PhoneNum != "" {
+		c.JSON(-1, response.AppErr.WithMsg("手机号已注册"))
 		return
 	}
 	userBasic := &models.UserBasic{}

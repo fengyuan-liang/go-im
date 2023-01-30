@@ -18,11 +18,11 @@ type UserBasic struct {
 	gorm.Model
 	UserId        uint64 `gorm:"column:user_id" json:"userId"`
 	UserNumber    string `gorm:"column:user_number" json:"userNumber"`
-	Name          string
-	Age           uint8
-	PassWord      string `gorm:"column:password" json:"password"`
-	PhoneNum      string
-	Email         string
+	Name          string `validate:"required" reg_error_info:"姓名不能为空"`
+	Age           uint8  `validate:"lt=0|gt=150" reg_error_info:"年龄不合法"`
+	Password      string `gorm:"column:password" json:"password"`
+	PhoneNum      string `validate:"RegexPhone" reg_error_info:"手机号格式不正确"`
+	Email         string `validate:"email" reg_error_info:"email为空或格式不正确"`
 	Identity      string
 	ClientIp      string
 	ClientPort    string
@@ -49,6 +49,20 @@ func getDB() *gorm.DB {
 }
 
 //===================== 查询相关 ==========================
+
+// FindUserByName 根据名字查用户
+func FindUserByName(name string) *UserBasic {
+	userBasic := &UserBasic{}
+	getDB().Where("name = ?", name).First(userBasic)
+	return userBasic
+}
+
+// FindUserByPhone 根据名字查用户
+func FindUserByPhone(phone string) *UserBasic {
+	userBasic := &UserBasic{}
+	getDB().Where("phone_num = ?", phone).First(userBasic)
+	return userBasic
+}
 
 // PageQueryUserList 分页查询
 func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
@@ -80,6 +94,7 @@ func PageQueryByFilter(pageNo int, pageSize int, filter func(*gorm.DB)) []*UserB
 // InsetOne 插入相关，需要防止并发情况和集群情况插入多次的问题TODO
 func InsetOne(basic *UserBasic) (tx *gorm.DB) {
 	db := getDB()
+	// 检查名字是否已经有了
 END:
 	// 生成`userId`，必须全局唯一
 	var cnt = 0
