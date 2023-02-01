@@ -20,8 +20,8 @@ import (
 // Check
 //
 //	@Description: 传入一个未加密的字符串和与加密后的数据，进行对比，如果正确就返回true
-//	@param content 未加密的字符
-//	@param encrypted 加密后的数据
+//	@args content 未加密的字符
+//	@args encrypted 加密后的数据
 //	@return bool 正确就返回true
 func Check(content, encrypted string) bool {
 	return strings.EqualFold(Encode(content), encrypted)
@@ -30,7 +30,7 @@ func Check(content, encrypted string) bool {
 // Encode
 //
 //	@Description: 散列值加密
-//	@param data 要加密的字符串
+//	@args data 要加密的字符串
 //	@return string 加密后的数据
 func Encode(data string) string {
 	h := md5.New()
@@ -38,13 +38,26 @@ func Encode(data string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+// EncodeBySalt md5并且加盐混淆
+//
+//	@args plainPwd 明文密码
+//	@args salt 盐
+func EncodeBySalt(plainPwd string, salt string) string {
+	return Encode(plainPwd + salt)
+}
+
+// CheckBySalt 检查加盐后密码是否一样
+func CheckBySalt(plainPwd string, salt string, password string) bool {
+	return EncodeBySalt(plainPwd, salt) == password
+}
+
 //==================== 对称加密 ==========================
 
 // AesEncrypt
 //
 //	@Description: aes对称加密
-//	@param orig 要加密的字段
-//	@param key 密钥
+//	@args orig 要加密的字段
+//	@args key 密钥
 //	@return string 加密后的字段
 func AesEncrypt(orig string, key string) string {
 	// 转成字节数组
@@ -69,8 +82,8 @@ func AesEncrypt(orig string, key string) string {
 // AesDecrypt
 //
 //	@Description: aes解密
-//	@param cryted 加密的密文
-//	@param key 密钥
+//	@args cryted 加密的密文
+//	@args key 密钥
 //	@return string 解密的字符串
 func AesDecrypt(cryted string, key string) string {
 	// 转成字节数组

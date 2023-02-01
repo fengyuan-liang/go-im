@@ -77,8 +77,8 @@ func ParseDefaultInt(args interface{}, callBack func(str string) (interface{}, e
 // ParseType
 //
 //	@Description: 将args转为指定的类型【stringType】
-//	@param args 需要类型转换的参数
-//	@param stringType 要转换的类型
+//	@args args 需要类型转换的参数
+//	@args stringType 要转换的类型
 //	@return newArgs 返回转换好类型的参数
 func ParseType(args interface{}, stringType string) (newArgs interface{}) {
 	switch stringType {

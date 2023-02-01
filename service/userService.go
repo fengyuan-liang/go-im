@@ -8,6 +8,7 @@ import (
 	"go-im/models"
 	"go-im/utils"
 	"gorm.io/gorm"
+	"math/rand"
 	"strconv"
 )
 
@@ -123,6 +124,10 @@ func CreateUser(c *gin.Context) {
 		c.JSON(500, response.AppErr.AppendMsg(err.Error()))
 		return
 	}
+	// 加盐用来存储密码
+	salt := fmt.Sprintf("%06d", rand.Int31())
+	userBasic.Salt = salt
+	userBasic.Password = utils.EncodeBySalt(userBasic.Password, salt)
 	// 插入数据
 	models.InsetOne(userBasic)
 	c.JSON(200, response.Ok)

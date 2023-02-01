@@ -31,6 +31,7 @@ type UserBasic struct {
 	LogOutTime    uint64 `gorm:"column:logout_time" json:"logout_time"`
 	isLogin       bool
 	DeviceInfo    string // 登陆设备信息
+	Salt          string // md5的盐
 }
 
 // TableName 用户表名
@@ -76,9 +77,9 @@ func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
 // PageQueryByFilter
 //
 //	 @Description: 根据过滤条件进行分页查询。可以使用
-//	 @param pageNo 第几页
-//	 @param pageSize 每页多少条数据
-//	 @param filter 回调函数，ex：
+//	 @args pageNo 第几页
+//	 @args pageSize 每页多少条数据
+//	 @args filter 回调函数，ex：
 //	 func(tx *gorm.DB) {
 //			for k, v := range queryMap {
 //				if k == "pageNo" || k == "pageSize" {
@@ -106,7 +107,7 @@ func PageQueryByFilter(pageNo int, pageSize int, filter func(*gorm.DB)) []*UserB
 // InsetOne
 //
 //	@Description: 插入相关，需要防止并发情况和集群情况插入多次的问题TODO
-//	@param basic 用户结构体，请传入指针
+//	@args basic 用户结构体，请传入指针
 //	@return tx 返回tx
 func InsetOne(basic *UserBasic) (tx *gorm.DB) {
 	db := getDB()
@@ -148,7 +149,7 @@ func Update(userId uint64, callback func(tx *gorm.DB)) {
 // LogicDelOne
 //
 //	@Description: 逻辑删除
-//	@param userId 用户id
+//	@args userId 用户id
 func LogicDelOne(userId uint64) {
 	DelOneByUserId(userId, true)
 }
@@ -157,11 +158,10 @@ func RealDelOne(userId uint64) {
 	DelOneByUserId(userId, false)
 }
 
-// DelOneByUserId
+// DelOneByUserId 根据userId删除用户
 //
-//	@Description: 根据userId删除用户
-//	@param userId 用户id
-//	@param isLogicDel 是否逻辑删除
+//	@args userId 用户id
+//	@args isLogicDel 是否逻辑删除
 func DelOneByUserId(userId uint64, isLogicDel bool) {
 	db := getDB()
 	if isLogicDel {
