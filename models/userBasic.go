@@ -73,8 +73,20 @@ func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
 	return userBasicList
 }
 
-// PageQueryByFilter 根据过滤条件进行分页查询。可以使用
-// pageNo 第几页
+// PageQueryByFilter
+//
+//	 @Description: 根据过滤条件进行分页查询。可以使用
+//	 @param pageNo 第几页
+//	 @param pageSize 每页多少条数据
+//	 @param filter 回调函数，ex：
+//	 func(tx *gorm.DB) {
+//			for k, v := range queryMap {
+//				if k == "pageNo" || k == "pageSize" {
+//					continue
+//				}
+//				tx.Where(k, v)
+//			}
+//	 @return []*UserBasic 返回查询到的分页数据
 func PageQueryByFilter(pageNo int, pageSize int, filter func(*gorm.DB)) []*UserBasic {
 	db := getDB()
 	// 初始化容器
@@ -91,7 +103,11 @@ func PageQueryByFilter(pageNo int, pageSize int, filter func(*gorm.DB)) []*UserB
 
 //===================== 插入相关 ==========================
 
-// InsetOne 插入相关，需要防止并发情况和集群情况插入多次的问题TODO
+// InsetOne
+//
+//	@Description: 插入相关，需要防止并发情况和集群情况插入多次的问题TODO
+//	@param basic 用户结构体，请传入指针
+//	@return tx 返回tx
 func InsetOne(basic *UserBasic) (tx *gorm.DB) {
 	db := getDB()
 	// 检查名字是否已经有了
@@ -129,6 +145,10 @@ func Update(userId uint64, callback func(tx *gorm.DB)) {
 
 //===================== 删除相关 ==========================
 
+// LogicDelOne
+//
+//	@Description: 逻辑删除
+//	@param userId 用户id
 func LogicDelOne(userId uint64) {
 	DelOneByUserId(userId, true)
 }
@@ -137,11 +157,11 @@ func RealDelOne(userId uint64) {
 	DelOneByUserId(userId, false)
 }
 
-// DelOneByUserId 删除一条数据
+// DelOneByUserId
 //
-// @params  userId 用户id
-//
-// @params  isLogicDel 是否逻辑删除
+//	@Description: 根据userId删除用户
+//	@param userId 用户id
+//	@param isLogicDel 是否逻辑删除
 func DelOneByUserId(userId uint64, isLogicDel bool) {
 	db := getDB()
 	if isLogicDel {
