@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go-im/common/entity/response"
 	"go-im/models"
+	"go-im/service/handle"
 	"go-im/utils"
 	"gorm.io/gorm"
 	"math/rand"
@@ -173,4 +174,34 @@ func Update(c *gin.Context) {
 		tx.Updates(parseMap)
 	})
 	c.JSON(200, response.Ok)
+}
+
+// Login 通用登录接口
+// @Tags 通用登录接口
+// @Param param body models.UserBasic true "上传的JSON"
+// @Produce json
+// @Router /user/login [post]
+func Login(c *gin.Context) {
+	type Params struct {
+		Name      string `validate:"required" reg_error_info:"姓名不能为空" json:"name"`
+		Password  bool   `validate:"required" reg_error_info:"密码不能为空" json:"password"`
+		LoginSign string `validate:"required" reg_error_info:"登录标识不能为空" json:"loginSign"`
+	}
+	params := &Params{}
+	if err := c.BindJSON(params); err != nil {
+		c.JSON(-1, response.Err.WithMsg("参数有误，err:"+err.Error()))
+		return
+	}
+	validate := validator.New()
+	if err := validate.Struct(params); err != nil {
+		c.JSON(-1, response.AppErr.WithMsg(utils.ProcessErr(params, err)))
+		return
+	}
+	parseMap, _ := utils.ParseMap(params, "json")
+	// 登录
+	if userBasic, err := handle.LoginBySign(params.LoginSign, parseMap); err != nil {
+		c.JSON(-1, response.AppErr.WithMsg(err.ErrorMsg()))
+	} else {
+		c.JSON(200, response.Ok.WithData(userBasic))
+	}
 }

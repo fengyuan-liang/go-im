@@ -25,7 +25,7 @@ func Router() *gin.Engine {
 	docs.SwaggerInfo.BasePath = ""
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	//================== 用户相关 =====================
-	// 用户路由组 ，处理用户相关GET请求
+	// 用户路由组 ，处理用户相关请求
 	u1 := r.Group("/user")
 	{
 		// 查询相关
@@ -38,6 +38,10 @@ func Router() *gin.Engine {
 			u1.POST("/register", service.CreateUser)
 			u1.POST("/delOne", service.DelOne)
 			u1.POST("/update", service.Update)
+		}
+		// 业务功能
+		{
+			u1.POST("/login", service.Login)
 		}
 	}
 	return r

@@ -65,6 +65,19 @@ func FindUserByPhone(phone string) *UserBasic {
 	return userBasic
 }
 
+// FindUserByNameAndPwd
+//
+//	@Description: 通过用户名和加密（加盐）后的密码查询用户
+//	@args name 用户名
+//	@args encodePwd 加盐加密后的密码
+//	@return *UserBasic 返回查询到的用户
+func FindUserByNameAndPwd(name string, encodePwd string) *UserBasic {
+	db := getDB()
+	userBasic := &UserBasic{}
+	db.Where("name = ?, password = ?", name, encodePwd).First(userBasic)
+	return userBasic
+}
+
 // PageQueryUserList 分页查询
 func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
 	db := getDB()

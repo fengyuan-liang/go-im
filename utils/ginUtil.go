@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-im/common/bizError"
+	"reflect"
 	"strings"
 )
 
@@ -41,4 +44,27 @@ func ParseMapFieldType(jsonMap map[string]interface{}, bean interface{}, ignoreF
 		}
 	}
 	return m
+}
+
+// ToMap 结构体转为Map[string]interface{}
+func ParseMap(in interface{}, tagName string) (map[string]interface{}, bizError.BizErrorer) {
+	out := make(map[string]interface{})
+
+	v := reflect.ValueOf(in)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct { // 非结构体返回错误提示
+		return nil, bizError.NewBizError(fmt.Sprintf("ToMap only accepts struct or struct pointer; got %T", v))
+	}
+	t := v.Type()
+	// 遍历结构体字段
+	// 指定tagName值为map中key;字段值为map中value
+	for i := 0; i < v.NumField(); i++ {
+		fi := t.Field(i)
+		if tagValue := fi.Tag.Get(tagName); tagValue != "" {
+			out[tagValue] = v.Field(i).Interface()
+		}
+	}
+	return out, nil
 }

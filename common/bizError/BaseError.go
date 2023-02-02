@@ -7,6 +7,8 @@ import (
 
 type BizErrorer interface {
 	BizError() string
+	ErrorMsg() string
+	ErrorTime() time.Time
 }
 
 // BizError 自定义错误
@@ -20,6 +22,15 @@ const FORMAT_DATA = "2006/01/02 15:04.000" // 标准格式化时间
 // 绑定一个方法
 func (bizError *BizError) Error() string {
 	return fmt.Sprintf("异常时间:【%v】，异常提示:【%v】", bizError.when.Format(FORMAT_DATA), bizError.what)
+}
+
+// ErrorMsg 只返回错误信息本身
+func (bizError *BizError) ErrorMsg() string {
+	return bizError.what
+}
+
+func (bizError *BizError) ErrorTime() time.Time {
+	return bizError.when
 }
 
 // BizError 绑定自定义异常进行区分
