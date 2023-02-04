@@ -45,6 +45,28 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "通用登录接口"
+                ],
+                "parameters": [
+                    {
+                        "description": "上传的JSON",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserBasic"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/user/pageQuery": {
             "get": {
                 "produces": [

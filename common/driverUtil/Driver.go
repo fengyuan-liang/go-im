@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
 	"go-im/common/bizError"
 	"go-im/config"
@@ -23,9 +24,29 @@ import (
 // @Date: 2023/01/19 15:59
 // @Author: fengyuan-liang@foxmail.com
 
-var db *sql.DB
-var client *mongo.Client
-var gormDb *gorm.DB
+func init() {
+	InitRedis()
+}
+
+var (
+	// ========== 数据库配置文件 ============
+	dbConfig *config.ConfigStruct
+	// ========== 数据库连接对象 ============
+	db          *sql.DB
+	gormDb      *gorm.DB
+	redisClient *redis.Client
+)
+
+// getDbConfig 获取配置文件防止多次加载
+func getDbConfig() *config.ConfigStruct {
+	if dbConfig == nil {
+		// 初始化配置
+		var configStruct config.ConfigStruct
+		configStruct = configStruct.GetDbInfo()
+		return &configStruct
+	}
+	return dbConfig
+}
 
 //=========================== 原生sql操作 ==================================
 
@@ -72,8 +93,37 @@ func InitMongoDB() (*mongo.Client, bizError.BizErrorer) {
 	return client, nil
 }
 
+//=========================== redis操作 ================================
+
+func InitRedis() (*redis.Client, bizError.BizErrorer) {
+	if redisClient != nil {
+		return redisClient, nil
+	}
+	// 配置文件
+	configStruct := getDbConfig()
+	redisConfig := configStruct.Db.Redis
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:         redisConfig.URL + ":" + redisConfig.PORT,
+		Password:     redisConfig.PASSWORD,
+		PoolSize:     redisConfig.POOL_SIZE,
+		MinIdleConns: redisConfig.MinIdleConns,
+		PoolTimeout:  time.Duration(redisConfig.PoolTimeout),
+	})
+	// 测试连接
+	result, err := redisClient.Ping().Result()
+	if err != nil {
+		fmt.Println("result is ", result)
+	} else {
+		fmt.Println("=====>>>>err:", err)
+	}
+	return redisClient, nil
+}
+
 //=========================== gorm操作 ==================================
 
+// InitGormDriverInterface
+//
+//	@Description: 策略模式可以实现不同数据源之间的切换
 type InitGormDriverInterface interface {
 	InitGormDriver() (*gorm.DB, bizError.BizErrorer)
 }
@@ -96,8 +146,7 @@ func (d *GormFormMySQLDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
 		return gormDb, nil
 	}
 	// 获取配置
-	var configStruct config.ConfigStruct
-	configStruct = configStruct.GetDbInfo()
+	configStruct := getDbConfig()
 	dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True",
 		configStruct.Db.Mysql.USER_NAME,
 		configStruct.Db.Mysql.PASSWORD,
@@ -154,8 +203,7 @@ func (d *GormFormMongoDbDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer)
 		return gormDb, nil
 	}
 	// 获取配置
-	var configStruct config.ConfigStruct
-	configStruct = configStruct.GetDbInfo()
+	configStruct := getDbConfig()
 	dsn := fmt.Sprintf("mongodb://%v:%v",
 		configStruct.Db.MongoDb.URL,
 		configStruct.Db.MongoDb.PORT)

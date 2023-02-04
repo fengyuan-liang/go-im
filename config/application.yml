@@ -11,6 +11,17 @@ db:
     LogLevel: info
     # 是否彩色打印sql
     Colorful: true
+  redis:
+    URL: "volunteer.fengxianhub.top"
+    PORT: 20012
+    PASSWORD: ""
+    DB: 0
+    # 数据库连接池连接数量
+    POOL_SIZE: 30
+    # 
+    MinIdleConns: 10
+    # 超时时间，单位毫秒
+    PoolTimeout: 30
   mongodb:
     USER_NAME: "root"
     PASSWORD: 123456

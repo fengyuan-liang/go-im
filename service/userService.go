@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go-im/common/entity/response"
 	"go-im/models"
-	"go-im/service/handle"
+	"go-im/service/handle/loginHanle"
 	"go-im/utils"
 	"gorm.io/gorm"
 	"math/rand"
@@ -103,17 +103,13 @@ func CreateUser(c *gin.Context) {
 		c.JSON(-1, response.AppErr.WithMsg(utils.ProcessErr(userParams, err)))
 		return
 	}
-	if userParams.Password != userParams.RePassword {
-		c.JSON(-1, response.AppErr.WithMsg("两次密码不一致"))
-		return
-	}
 	// 检查用户名 电话是否已经存在
 	userByName := models.FindUserByName(userParams.Name)
 	if userByName.Name != "" {
 		c.JSON(-1, response.AppErr.WithMsg("用户名已注册"))
 		return
 	}
-	userByPhone := models.FindUserByName(userParams.PhoneNum)
+	userByPhone := models.FindUserByPhone(userParams.PhoneNum)
 	if userByPhone.PhoneNum != "" {
 		c.JSON(-1, response.AppErr.WithMsg("手机号已注册"))
 		return
@@ -184,7 +180,7 @@ func Update(c *gin.Context) {
 func Login(c *gin.Context) {
 	type Params struct {
 		Name      string `validate:"required" reg_error_info:"姓名不能为空" json:"name"`
-		Password  bool   `validate:"required" reg_error_info:"密码不能为空" json:"password"`
+		Password  string `validate:"required" reg_error_info:"密码不能为空" json:"password"`
 		LoginSign string `validate:"required" reg_error_info:"登录标识不能为空" json:"loginSign"`
 	}
 	params := &Params{}
@@ -199,7 +195,7 @@ func Login(c *gin.Context) {
 	}
 	parseMap, _ := utils.ParseMap(params, "json")
 	// 登录
-	if userBasic, err := handle.LoginBySign(params.LoginSign, parseMap); err != nil {
+	if userBasic, err := loginHanle.LoginBySign(params.LoginSign, parseMap); err != nil {
 		c.JSON(-1, response.AppErr.WithMsg(err.ErrorMsg()))
 	} else {
 		c.JSON(200, response.Ok.WithData(userBasic))
