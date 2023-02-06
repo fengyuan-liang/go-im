@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"go-im/common/bizError"
 	"go-im/config"
@@ -110,9 +110,9 @@ func InitRedis() (*redis.Client, bizError.BizErrorer) {
 		PoolTimeout:  time.Duration(redisConfig.PoolTimeout),
 	})
 	// 测试连接
-	result, err := redisClient.Ping().Result()
+	result, err := redisClient.Ping(context.TODO()).Result()
 	if err != nil {
-		fmt.Println("result is ", result)
+		fmt.Println("redis connection  success,  result is ", result)
 	} else {
 		fmt.Println("=====>>>>err:", err)
 	}
