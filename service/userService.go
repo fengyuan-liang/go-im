@@ -4,13 +4,18 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/websocket"
+	"go-im/common/bizError"
+	"go-im/common/driverHelper/redisHelper"
 	"go-im/common/entity/response"
 	"go-im/models"
 	"go-im/service/handle/loginHanle"
 	"go-im/utils"
 	"gorm.io/gorm"
 	"math/rand"
+	"net/http"
 	"strconv"
+	"time"
 )
 
 // @Description:
@@ -200,4 +205,53 @@ func Login(c *gin.Context) {
 	} else {
 		c.JSON(200, response.Ok.WithData(userBasic))
 	}
+}
+
+//====================== websocket相关 ==============================
+
+// 防止跨域伪造请求
+var upGrade = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+// WsSendMsg
+//
+//	@Description: 通过ws发送消息
+//	@args c
+//	@return bizError.BizErrorer
+func WsSendMsg(c *gin.Context) {
+	// 拿到发送的消息
+	msg := c.Query("msg")
+	ws, err := upGrade.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println("ws消息发送失败，err Info：", err.Error())
+		return
+	}
+	defer func(ws *websocket.Conn) {
+		err = ws.Close()
+		if err != nil {
+			fmt.Println("ws消息发送失败，err Info：", err.Error())
+		}
+	}(ws)
+	e := MsgHandle(msg, ws, c)
+	if e != nil {
+		fmt.Println("ws消息发送失败，err Info：", e.BizError())
+	}
+}
+
+func MsgHandle(msg string, ws *websocket.Conn, c *gin.Context) bizError.BizErrorer {
+	tm := time.Now().Format("2006-01-02 15:04:05")
+	m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
+	// 发送给redis
+	err := redisHelper.Publish(c, redisHelper.PublishKey, msg)
+	if err != nil {
+		return bizError.NewBizError(err.Error())
+	}
+	err = ws.WriteMessage(1, []byte(m))
+	if err != nil {
+		return bizError.NewBizError(err.Error())
+	}
+	return nil
 }

@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"go-im/common/bizError"
-	"go-im/common/driverUtil"
+	"go-im/common/driverHelper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -35,7 +35,7 @@ func InitMongoDbHelper(dbName string, collectionName string) (MongoDbHelper, biz
 	}
 	// 初始化数据库连接
 	start := time.Now()
-	mongodbHelper.Client, dbConnectionError = driverUtil.InitMongoDB()
+	mongodbHelper.Client, dbConnectionError = driverHelper.InitMongoDB()
 	if dbConnectionError != nil {
 		return mongodbHelper, bizError.NewBizError("数据库连接建立失败，错误信息为：", dbConnectionError.BizError())
 	}

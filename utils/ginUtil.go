@@ -3,12 +3,9 @@ package utils
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"go-im/common/bizError"
-	"net/http"
 	"reflect"
 	"strings"
-	"time"
 )
 
 // @Description: gin工具
@@ -70,40 +67,4 @@ func ParseMap(in interface{}, tagName string) (map[string]interface{}, bizError.
 		}
 	}
 	return out, nil
-}
-
-//====================== websocket相关 ==============================
-
-// 防止跨域伪造请求
-var upGrade = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-func WsSendMsg(c *gin.Context) {
-	ws, err := upGrade.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		fmt.Errorf("ws消息发送失败，err Info：%v", err)
-	}
-	defer func(ws *websocket.Conn) {
-		err := ws.Close()
-		if err != nil {
-			fmt.Errorf("ws关闭失败，err Info：%v", err)
-		}
-	}(ws)
-	MsgHandle(ws, c)
-}
-
-func MsgHandle(ws *websocket.Conn, c *gin.Context) {
-	msg, err := Subscribe(c, PublishKey)
-	if err != nil {
-		fmt.Println(err)
-	}
-	tm := time.Now().Format("2006-01-02 15:04:05")
-	m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
-	err = ws.WriteMessage(1, []byte(m))
-	if err != nil {
-		fmt.Println(err)
-	}
 }

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"go-im/common/driverUtil"
+	"go-im/common/driverHelper"
 	"go-im/sql/daoEntity"
 	"go-im/utils"
 	"gorm.io/gorm"
@@ -44,7 +44,7 @@ var localDB *gorm.DB
 // getDB 这里可以改成根据配置文件选择数据源
 func getDB() *gorm.DB {
 	if localDB == nil {
-		localDB, _ = driverUtil.GetGormDriver(&driverUtil.GormFormMySQLDriver{})
+		localDB, _ = driverHelper.GetGormDriver(&driverHelper.GormFormMySQLDriver{})
 	}
 	return localDB
 }

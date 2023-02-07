@@ -43,6 +43,10 @@ func Router() *gin.Engine {
 		{
 			u1.POST("/login", service.Login)
 		}
+		// ws相关
+		{
+			u1.GET("/sendMsg", service.WsSendMsg)
+		}
 	}
 	return r
 }
