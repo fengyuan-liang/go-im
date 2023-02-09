@@ -171,10 +171,11 @@ func RealDelOne(userId uint64) {
 	DelOneByUserId(userId, false)
 }
 
-// DelOneByUserId 根据userId删除用户
+// DelOneByUserId
 //
-//	@args userId 用户id
-//	@args isLogicDel 是否逻辑删除
+//	 @Description: 根据userId删除用户
+//		@args userId 用户id
+//		@args isLogicDel 是否逻辑删除
 func DelOneByUserId(userId uint64, isLogicDel bool) {
 	db := getDB()
 	if isLogicDel {

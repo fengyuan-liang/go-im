@@ -23,9 +23,13 @@ func GetAllQueryParams(c *gin.Context) map[string]interface{} {
 	return queryMap
 }
 
-// ParseMapFieldType 根据bean的类型将jsonMap value类型转换
+// ParseMapFieldType
 //
-// @params filter 过滤器，那些字段不用添加
+//	@Description: 根据bean的类型将jsonMap value类型转换
+//	@args jsonMap 结构体对应泛化的map
+//	@args bean 要转换的结构体类型
+//	@args ignoreField 结构体内那些字段不需要加入到map中
+//	@return map[string]interface{}
 func ParseMapFieldType(jsonMap map[string]interface{}, bean interface{}, ignoreField ...string) map[string]interface{} {
 	// 拿到结构体所有属性的类型
 	stringTypeMap := GetLowerTitleFieldStringType(bean)
@@ -46,10 +50,15 @@ func ParseMapFieldType(jsonMap map[string]interface{}, bean interface{}, ignoreF
 	return m
 }
 
-// ParseMap 结构体转为Map[string]interface{}
+// ParseMap
+//
+//	@Description: 结构体转为Map[string]interface{}
+//	@args in 传入的结构体
+//	@args tagName 结构体内tag，用作map的key
+//	@return map[string]interface{}
+//	@return bizError.BizErrorer
 func ParseMap(in interface{}, tagName string) (map[string]interface{}, bizError.BizErrorer) {
 	out := make(map[string]interface{})
-
 	v := reflect.ValueOf(in)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
