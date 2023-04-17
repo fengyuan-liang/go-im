@@ -3,7 +3,6 @@ package utils
 import (
 	"github.com/spf13/viper"
 	"log"
-	"os"
 )
 
 // @Description: 系统初始化相关
@@ -13,27 +12,20 @@ import (
 
 var vip *viper.Viper
 
-func init() {
-	// 初始化配置文件
-	InitConfig()
-}
-
 // InitConfig 读取config.yml中的配置文件
-func InitConfig() *viper.Viper {
+func InitConfig(filePath string) *viper.Viper {
 	//获取项目的执行路径
-	path, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	//path, err := os.Getwd()
+	//if err != nil {
+	//	panic(err)
+	//}
 	vip = viper.New()
-	vip.AddConfigPath(path + "/config") //设置读取的文件路径
-	vip.SetConfigName("application")    //设置读取的文件名
-	vip.SetConfigType("yaml")           //设置文件的类型
+	//vip.AddConfigPath(path + "/config") //设置读取的文件路径
+	//vip.SetConfigName("application")    //设置读取的文件名
+	//vip.SetConfigType("yaml")           //设置文件的类型
+	vip.SetConfigFile(filePath)
 	//尝试进行配置读取
 	if err := vip.ReadInConfig(); err != nil {
-		panic(err)
-	}
-	if err != nil {
 		log.Fatal("配置文件初始化失败，info：", err)
 	}
 	return vip
@@ -42,7 +34,7 @@ func InitConfig() *viper.Viper {
 // GetOrDefaultViper 获取解析到的viper
 func GetOrDefaultViper() *viper.Viper {
 	if vip == nil {
-		vip = InitConfig()
+		panic("have no config，please init")
 	}
 	return vip
 }

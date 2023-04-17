@@ -2,8 +2,8 @@ db:
   mysql:
     USER_NAME: "root"
     PASSWORD: 123456
-    URL: "volunteer.fengxianhub.top"
-    PORT: 20062
+    URL: {{ .mysql_url }}
+    PORT: {{ .mysql_port }}
     DB_NAME: "gin_chat"
     # 慢sql阈值，单位毫秒
     SlowThreshold: 100
@@ -12,8 +12,8 @@ db:
     # 是否彩色打印sql
     Colorful: true
   redis:
-    URL: "volunteer.fengxianhub.top"
-    PORT: 20012
+    URL: {{ .redis_url }}
+    PORT: {{ .redis_port }}
     PASSWORD: ""
     DB: 0
     # 数据库连接池连接数量
@@ -25,7 +25,7 @@ db:
   mongodb:
     USER_NAME: "root"
     PASSWORD: 123456
-    URL: "volunteer.fengxianhub.top"
-    PORT: 20062
+    URL: {{ .mongodb_url }}
+    PORT: {{ .mongo_port }}
     DB_NAME: "gin_chat"
 

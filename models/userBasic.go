@@ -44,7 +44,7 @@ var localDB *gorm.DB
 // getDB 这里可以改成根据配置文件选择数据源
 func getDB() *gorm.DB {
 	if localDB == nil {
-		localDB, _ = driverHelper.GetGormDriver(&driverHelper.GormFormMySQLDriver{})
+		localDB, _ = driverHelper.GetOrDefaultGormDriver(&driverHelper.GormFormMySQLDriver{})
 	}
 	return localDB
 }

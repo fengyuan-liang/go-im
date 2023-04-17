@@ -24,10 +24,6 @@ import (
 // @Date: 2023/01/19 15:59
 // @Author: fengyuan-liang@foxmail.com
 
-func init() {
-	InitRedis()
-}
-
 var (
 	// ========== 数据库配置文件 ============
 	dbConfig *config.ConfigStruct
@@ -37,8 +33,8 @@ var (
 	redisClient *redis.Client
 )
 
-// getDbConfig 获取配置文件防止多次加载
-func getDbConfig() *config.ConfigStruct {
+// GetDbConfig 获取配置文件防止多次加载
+func GetDbConfig() *config.ConfigStruct {
 	if dbConfig == nil {
 		// 初始化配置
 		var configStruct config.ConfigStruct
@@ -51,6 +47,7 @@ func getDbConfig() *config.ConfigStruct {
 //=========================== 原生sql操作 ==================================
 
 // InitMySQLDB 初始化mysql数据库连接
+// @Deprecated
 func InitMySQLDB() (*sql.DB, bizError.BizErrorer) {
 	if db != nil {
 		return db, nil
@@ -95,12 +92,12 @@ func InitMongoDB() (*mongo.Client, bizError.BizErrorer) {
 
 //=========================== redis操作 ================================
 
-func InitRedis() (*redis.Client, bizError.BizErrorer) {
+func GetOrDefaultRedis() (*redis.Client, bizError.BizErrorer) {
 	if redisClient != nil {
 		return redisClient, nil
 	}
 	// 配置文件
-	configStruct := getDbConfig()
+	configStruct := GetDbConfig()
 	redisConfig := configStruct.Db.Redis
 	redisClient = redis.NewClient(&redis.Options{
 		Addr:         redisConfig.URL + ":" + redisConfig.PORT,
@@ -125,12 +122,12 @@ func InitRedis() (*redis.Client, bizError.BizErrorer) {
 //
 //	@Description: 策略模式可以实现不同数据源之间的切换
 type InitGormDriverInterface interface {
-	InitGormDriver() (*gorm.DB, bizError.BizErrorer)
+	InitGormDriver(configStruct *config.ConfigStruct) (*gorm.DB, bizError.BizErrorer)
 }
 
-// GetGormDriver 多态方法
-func GetGormDriver(gormDriver InitGormDriverInterface) (*gorm.DB, bizError.BizErrorer) {
-	return gormDriver.InitGormDriver()
+// GetOrDefaultGormDriver 多态方法
+func GetOrDefaultGormDriver(gormDriver InitGormDriverInterface) (*gorm.DB, bizError.BizErrorer) {
+	return gormDriver.InitGormDriver(GetDbConfig())
 }
 
 type GormDriverBasic struct {
@@ -141,12 +138,10 @@ type GormFormMySQLDriver struct {
 	basic GormDriverBasic
 }
 
-func (d *GormFormMySQLDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
+func (d *GormFormMySQLDriver) InitGormDriver(configStruct *config.ConfigStruct) (*gorm.DB, bizError.BizErrorer) {
 	if gormDb != nil {
 		return gormDb, nil
 	}
-	// 获取配置
-	configStruct := getDbConfig()
 	dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True",
 		configStruct.Db.Mysql.USER_NAME,
 		configStruct.Db.Mysql.PASSWORD,
@@ -198,12 +193,10 @@ type GormFormMongoDbDriver struct {
 	basic GormDriverBasic
 }
 
-func (d *GormFormMongoDbDriver) InitGormDriver() (*gorm.DB, bizError.BizErrorer) {
+func (d *GormFormMongoDbDriver) InitGormDriver(configStruct *config.ConfigStruct) (*gorm.DB, bizError.BizErrorer) {
 	if gormDb != nil {
 		return gormDb, nil
 	}
-	// 获取配置
-	configStruct := getDbConfig()
 	dsn := fmt.Sprintf("mongodb://%v:%v",
 		configStruct.Db.MongoDb.URL,
 		configStruct.Db.MongoDb.PORT)
