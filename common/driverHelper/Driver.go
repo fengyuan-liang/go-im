@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"go-im/common/bizError"
 	"go-im/config"
@@ -37,9 +37,8 @@ var (
 func GetDbConfig() *config.ConfigStruct {
 	if dbConfig == nil {
 		// 初始化配置
-		var configStruct config.ConfigStruct
-		configStruct = configStruct.GetDbInfo()
-		return &configStruct
+		configStruct := config.GetConfig()
+		return configStruct
 	}
 	return dbConfig
 }
@@ -92,29 +91,29 @@ func InitMongoDB() (*mongo.Client, bizError.BizErrorer) {
 
 //=========================== redis操作 ================================
 
-func GetOrDefaultRedis() (*redis.Client, bizError.BizErrorer) {
-	if redisClient != nil {
-		return redisClient, nil
-	}
-	// 配置文件
-	configStruct := GetDbConfig()
-	redisConfig := configStruct.Db.Redis
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:         redisConfig.URL + ":" + redisConfig.PORT,
-		Password:     redisConfig.PASSWORD,
-		PoolSize:     redisConfig.POOL_SIZE,
-		MinIdleConns: redisConfig.MinIdleConns,
-		PoolTimeout:  time.Duration(redisConfig.PoolTimeout),
-	})
-	// 测试连接
-	result, err := redisClient.Ping(context.TODO()).Result()
-	if err != nil {
-		fmt.Println("redis connection  success,  result is ", result)
-	} else {
-		fmt.Println("=====>>>>err:", err)
-	}
-	return redisClient, nil
-}
+//func GetOrDefaultRedis() (*redis.Client, bizError.BizErrorer) {
+//	if redisClient != nil {
+//		return redisClient, nil
+//	}
+//	// 配置文件
+//	configStruct := GetDbConfig()
+//	redisConfig := configStruct.Db.Redis
+//	redisClient = redis.NewClient(&redis.Options{
+//		Addr:         redisConfig.URL + ":" + redisConfig.PORT,
+//		Password:     redisConfig.PASSWORD,
+//		PoolSize:     redisConfig.POOL_SIZE,
+//		MinIdleConns: redisConfig.MinIdleConns,
+//		PoolTimeout:  time.Duration(redisConfig.PoolTimeout),
+//	})
+//	// 测试连接
+//	result, err := redisClient.Ping(context.TODO()).Result()
+//	if err != nil {
+//		fmt.Println("redis connection  success,  result is ", result)
+//	} else {
+//		fmt.Println("=====>>>>err:", err)
+//	}
+//	return redisClient, nil
+//}
 
 //=========================== gorm操作 ==================================
 

@@ -3,7 +3,7 @@ package redisHelper
 import (
 	"context"
 	"fmt"
-	"go-im/common/driverHelper"
+	"go-im/pkg/common/xredis"
 )
 
 const (
@@ -18,8 +18,7 @@ const (
 //	@args msg
 //	@return bizError.BizErrorer
 func Publish(ctx context.Context, channel string, msg string) error {
-	redis, _ := driverHelper.GetOrDefaultRedis()
-	result := redis.Publish(ctx, channel, msg)
+	result := xredis.Cli.Client.Publish(ctx, channel, msg)
 	fmt.Println("向redis推送消息：", msg)
 	return result.Err()
 }
@@ -32,8 +31,7 @@ func Publish(ctx context.Context, channel string, msg string) error {
 //	@return string
 //	@return error
 func Subscribe(ctx context.Context, channel string) (string, error) {
-	redis, _ := driverHelper.GetOrDefaultRedis()
-	subscribe := redis.Subscribe(ctx, channel)
+	subscribe := xredis.Cli.Client.Subscribe(ctx, channel)
 	message, err := subscribe.ReceiveMessage(ctx)
 	return message.Payload, err
 }

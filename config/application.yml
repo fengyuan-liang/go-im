@@ -1,3 +1,5 @@
+server:
+  PORT: {{ .port }}
 db:
   mysql:
     USER_NAME: "root"

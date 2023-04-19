@@ -15,6 +15,9 @@ import (
 
 func Router() *gin.Engine {
 	r := gin.Default()
+	//================== 中间件 =====================
+	// jwt鉴权
+	//r.Use(middleware.JwtAuth())
 	//================== 系统相关 =====================
 	defaultGroup := r.Group("/")
 	{

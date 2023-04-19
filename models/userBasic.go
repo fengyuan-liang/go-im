@@ -1,8 +1,7 @@
 package models
 
 import (
-	"go-im/common/driverHelper"
-	"go-im/sql/daoEntity"
+	"go-im/pkg/xmysql"
 	"go-im/utils"
 	"gorm.io/gorm"
 	"strconv"
@@ -44,7 +43,7 @@ var localDB *gorm.DB
 // getDB 这里可以改成根据配置文件选择数据源
 func getDB() *gorm.DB {
 	if localDB == nil {
-		localDB, _ = driverHelper.GetOrDefaultGormDriver(&driverHelper.GormFormMySQLDriver{})
+		localDB = xmysql.DB
 	}
 	return localDB
 }
@@ -83,7 +82,7 @@ func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
 	db := getDB()
 	// 初始化容器
 	userBasicList := make([]*UserBasic, pageSize)
-	db.Scopes(daoEntity.Paginate(pageNo, pageSize)).Find(&userBasicList)
+	db.Scopes(utils.Paginate(pageNo, pageSize)).Find(&userBasicList)
 	return userBasicList
 }
 
@@ -104,7 +103,7 @@ func PageQueryUserList(pageNo int, pageSize int) []*UserBasic {
 func PageQueryByFilter(pageNo int, pageSize int, filter func(*gorm.DB)) []*UserBasic {
 	db := getDB()
 	// 初始化容器
-	tx := db.Scopes(daoEntity.Paginate(pageNo, pageSize))
+	tx := db.Scopes(utils.Paginate(pageNo, pageSize))
 	// 执行回调函数
 	if filter != nil {
 		filter(tx)

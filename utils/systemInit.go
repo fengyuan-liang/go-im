@@ -30,11 +30,3 @@ func InitConfig(filePath string) *viper.Viper {
 	}
 	return vip
 }
-
-// GetOrDefaultViper 获取解析到的viper
-func GetOrDefaultViper() *viper.Viper {
-	if vip == nil {
-		panic("have no config，please init")
-	}
-	return vip
-}

@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
-	"go-im/common/driverHelper"
-	"go-im/router"
-	"go-im/utils"
+	"go-im/config"
+	"go-im/pkg/commands"
+	"go-im/pkg/common/xredis"
+	"go-im/pkg/xgin"
+	"go-im/pkg/xmysql"
 )
 
 // @Description: 启动类
@@ -19,15 +21,12 @@ var (
 
 func init() {
 	flag.Parse()
-	utils.InitConfig(*confFile)
-	driverHelper.GetOrDefaultGormDriver(&driverHelper.GormFormMySQLDriver{})
-	driverHelper.GetOrDefaultRedis()
+	conf := config.InitConfig(confFile, port)
+	xmysql.InitMysql(conf)
+	xredis.NewRedisClient(&conf.Db.Redis)
 }
 
 // @title
 func main() {
-	// 路由
-	r := router.Router()
-	// 监听端口
-	r.Run(":" + utils.ParseString(*port))
+	commands.Run(xgin.GinServer{})
 }

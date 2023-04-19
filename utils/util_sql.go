@@ -1,11 +1,12 @@
-package daoEntity
+// Copyright 2023 QINIU. All rights reserved
+// @Description:
+// @Version: 1.0.0
+// @Date: 2023/04/19 15:50
+// @Author: liangfengyuan@qiniu.com
+
+package utils
 
 import "gorm.io/gorm"
-
-// @Description: 通用dao层实体类
-// @Version: 1.0.0
-// @Date: 2023/01/28 14:32
-// @Author: fengyuan-liang@foxmail.com
 
 // Paginate 分页封装
 func Paginate(page int, pageSize int) func(db *gorm.DB) *gorm.DB {

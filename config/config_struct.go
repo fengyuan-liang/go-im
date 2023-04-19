@@ -11,7 +11,8 @@ import (
 
 // ConfigStruct 配置文件映射实体类
 type ConfigStruct struct {
-	Db DBConfig `yaml:"db"`
+	Db     DBConfig     `yaml:"db"`
+	Server ServerConfig `yaml:"server"`
 }
 
 // DBConfig 映射yml配置文件结构体
@@ -40,18 +41,42 @@ type RedisStruct struct {
 	URL          string `yaml:"URL"`
 	PORT         string `yaml:"PORT"`
 	PASSWORD     string `yaml:"PASSWORD"`
-	DB           string `yaml:"DB"`
+	DB           int    `yaml:"DB"`
 	POOL_SIZE    int    `yaml:"POOL_SIZE"`
 	MinIdleConns int    `yaml:"MinIdleConns"`
 	PoolTimeout  int    `yaml:"PoolTimeout"`
+	Prefix       string `yaml:"Prefix"` //所有key的前缀
 }
 
-// GetDbInfo 获取config下`db`的配置
-func (dbInfo ConfigStruct) GetDbInfo() ConfigStruct {
-	vip := utils.GetOrDefaultViper()
+type ServerConfig struct {
+	PORT int `yaml:"PORT"`
+}
+
+var config *ConfigStruct
+
+func GetConfig() *ConfigStruct {
+	if config == nil {
+		panic("config is empty")
+	}
+	return config
+}
+
+// InitConfig 获取config下`db`的配置
+func InitConfig(filePath *string, port *int) *ConfigStruct {
+	if config != nil {
+		return config
+	}
+	if filePath == nil {
+		panic("filePath is empty")
+	}
+	vip := utils.InitConfig(*filePath)
 	// 读取db配置
-	if err := vip.Unmarshal(&dbInfo); err != nil {
+	if err := vip.Unmarshal(&config); err != nil {
 		panic("解析db配置异常, info:" + err.Error())
 	}
-	return dbInfo
+	if *port != 8080 {
+		// 如果用户-p输入，则使用，否者配置文件优先级高
+		config.Server.PORT = *port
+	}
+	return config
 }
