@@ -15,6 +15,13 @@ var (
 	DB *gorm.DB
 )
 
+func GetDB() *gorm.DB {
+	if DB == nil {
+		panic("db not init...")
+	}
+	return DB
+}
+
 func InitMysql(configStruct *config.ConfigStruct) {
 	if DB != nil {
 		return

@@ -2,7 +2,6 @@ package xredis
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-redsync/redsync/v4"
 	redsyncredis "github.com/go-redsync/redsync/v4/redis"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
@@ -29,19 +28,19 @@ func NewRedisClient(cfg *config.RedisStruct) *redis.Client {
 	)
 	// 单机redis
 	client = redis.NewClient(&redis.Options{
-		Addr:     cfg.URL,
+		Addr:     cfg.URL + ":" + cfg.PORT,
 		Password: cfg.PASSWORD,
 		DB:       cfg.DB,
 	})
 	// 判断是否能够链接到redis
 	_, err = client.Ping(context.Background()).Result()
 	if err != nil {
-		fmt.Println(err.Error())
+		panic(err)
 	}
 	// redis 锁
 	pool = goredis.NewPool(client)
 	redsSync = redsync.New(pool)
-
 	Cli = &RedisClient{client, redsSync, cfg.Prefix}
+
 	return client
 }

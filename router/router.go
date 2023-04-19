@@ -49,6 +49,7 @@ func Router() *gin.Engine {
 		// ws相关
 		{
 			u1.GET("/sendMsg", service.WsSendMsg)
+			u1.GET("/chat", service.Chat)
 		}
 	}
 	return r
