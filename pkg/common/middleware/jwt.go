@@ -7,20 +7,20 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-im/common/entity/response"
 	"go-im/pkg/common/xjwt"
+	"go-im/pkg/common/xlog"
 )
 
 func JwtAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		token, err := xjwt.ParseFromCookie(ctx)
+		token, err := xjwt.ParseFromHeader(ctx)
 		if err != nil {
 			ctx.Abort()
 			ctx.SecureJSON(-1, response.AppErr.WithMsg("请登录"))
 			return
 		}
-		fmt.Println("验证成功", token)
+		xlog.Infof("验证成功, token[%v]", token)
 	}
 }

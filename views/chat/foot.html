@@ -457,7 +457,7 @@
 
                 },
                 initwebsocket: function () {
-                    var url = "ws://" + location.host + "/chat?userId=" + userId() + "&token=" + util.parseQuery("token");
+                    var url = "ws://" + location.host + "/api/chat?userId=" + userId() + "&token=" + util.parseQuery("token");
                     this.webSocket = new WebSocket(url);
                     //消息处理
                     this.webSocket.onmessage = function (evt) {
@@ -486,7 +486,7 @@
                 },
                 loadfriends: function () {
                     var that = this;
-                    post("searchFriends", { userId: userId() }, function (res) {
+                    post("api/searchFriends", { userId: userId() }, function (res) {
                         that.friends = res.Rows || [];
                         var usermap = this.usermap;
                         for (var i in res.Rows) {
@@ -498,7 +498,7 @@
                 },
                 loadcommunitys: function () {
                     var that = this;
-                    post("contact/loadcommunity", { ownerId: userId() }, function (res) {
+                    post("api/contact/loadcommunity", { ownerId: userId() }, function (res) {
                         that.communitys = res.Rows || [];
                     })
                 },
@@ -527,7 +527,7 @@
                         this.setTimeFlag()
                         //console.log("_addfriend....")
                         var that = this
-                        post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
+                        post("/api/contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
                                 that.loadfriends();

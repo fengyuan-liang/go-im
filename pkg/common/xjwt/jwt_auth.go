@@ -67,7 +67,7 @@ func ParseFromHeader(ctx *gin.Context) (res *jwt.Token, err error) {
 			return []byte(constant.JWT_TOKEN_SECRET_KEY), nil
 		})
 	if err == request.ErrNoTokenInRequest {
-		token := ctx.Query("token")
+		token := ctx.GetHeader("token")
 		res, err = jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 			return []byte(constant.JWT_TOKEN_SECRET_KEY), nil
 		})

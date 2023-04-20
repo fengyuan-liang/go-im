@@ -28,10 +28,6 @@ func Router() *gin.Engine {
 	{
 		defaultGroup.GET("/", service.GetIndex)
 		defaultGroup.GET("index", service.GetIndex)
-		defaultGroup.GET("/toRegister", service.ToRegister)
-		defaultGroup.GET("/toChat", service.ToChat)
-		defaultGroup.GET("/chat", service.Chat)
-		defaultGroup.POST("/searchFriends", service.SearchFriends)
 	}
 	//================== swagger相关 =====================
 	// 设置docs文件相对路径
@@ -40,10 +36,15 @@ func Router() *gin.Engine {
 	//================== 不需要验证token ===============
 	defaultGroup.POST("/login", service.Login)
 	defaultGroup.POST("/createUser", service.CreateUser)
+	//================== 页面跳转 =====================
+	// 页面跳转
+	{
+		r.GET("/toRegister", service.ToRegister)
+		r.GET("/toChat", service.ToChat)
+	}
 	//================== 用户相关 =====================
 	// 用户路由组 ，处理用户相关请求
-	u1 := r.Group("/user")
-	// 不需要验证token
+	u1 := r.Group("/api")
 	// 需要验证token
 	u1.Use(middleware.JwtAuth())
 	{
@@ -51,6 +52,7 @@ func Router() *gin.Engine {
 		{
 			u1.GET("/pageQuery", service.PageQueryUserList)
 			u1.GET("/pageQueryByFilter", service.PageQueryByFilter)
+			u1.POST("/searchFriends", service.SearchFriends)
 		}
 		// 修改相关
 		{
@@ -66,6 +68,12 @@ func Router() *gin.Engine {
 		{
 			u1.GET("/sendMsg", service.WsSendMsg)
 			u1.GET("/chat", service.Chat)
+		}
+		// 用户关系
+		contactGroup := u1.Group("/contact")
+		{
+			contactGroup.POST("/addfriend", service.AddFriend)
+			contactGroup.POST("/searchFriends", service.SearchFriends)
 		}
 	}
 	return r

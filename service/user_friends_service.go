@@ -26,6 +26,7 @@ func SearchFriends(c *gin.Context) {
 	friends, err := repository.GetContactRepo().SearchFriends(uint64(id))
 	if err != nil {
 		c.JSON(-1, response.AppErr.WithData(fmt.Sprintf("查询失败，%v", err.Error())))
+		return
 	}
 	c.JSON(200, response.Ok.WithData(friends))
 }

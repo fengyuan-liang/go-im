@@ -30,10 +30,12 @@ func GetContactRepo() *ContactRepository {
 }
 
 func (repo *ContactRepository) AddFriend(contact *models.Contact) error {
+	contact = new(models.Contact)
 	return xmysql.GetDB().Create(contact).Error
 }
 
 func (repo *ContactRepository) SearchFriends(ownerId uint64) (friends *[]models.Contact, err error) {
+	friends = new([]models.Contact)
 	err = xmysql.GetDB().Where("owner_id = ?", ownerId).Find(friends).Error
 	return
 }
