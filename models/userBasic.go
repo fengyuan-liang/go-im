@@ -1,7 +1,7 @@
 package models
 
 import (
-	"go-im/pkg/xmysql"
+	"go-im/pkg/common/xmysql"
 	"go-im/utils"
 	"gorm.io/gorm"
 	"strconv"
@@ -17,11 +17,11 @@ type UserBasic struct {
 	gorm.Model
 	UserId        uint64 `gorm:"column:user_id" json:"userId"`
 	UserNumber    string `gorm:"column:user_number" json:"userNumber"`
-	Name          string `validate:"required" reg_error_info:"姓名不能为空"`
-	Age           uint8  `validate:"gt=0,lt=200" reg_error_info:"年龄不合法"`
-	Password      string `gorm:"column:password" json:"password"`
-	PhoneNum      string `validate:"RegexPhone" reg_error_info:"手机号格式不正确"`
-	Email         string `validate:"email" reg_error_info:"email为空或格式不正确"`
+	Name          string `json:"name" validate:"required" reg_error_info:"姓名不能为空"`
+	Age           uint8  `json:"age" validate:"gt=0,lt=200" reg_error_info:"年龄不合法"`
+	Password      string `json:"password" gorm:"column:password" json:"password"`
+	PhoneNum      string `json:"phoneNum" validate:"RegexPhone" reg_error_info:"手机号格式不正确"`
+	Email         string `json:"email" validate:"email" reg_error_info:"email为空或格式不正确"`
 	Identity      string
 	ClientIp      string
 	ClientPort    string

@@ -5,6 +5,7 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go-im/docs"
+	"go-im/pkg/common/middleware"
 	"go-im/service"
 )
 
@@ -20,20 +21,31 @@ func Router() *gin.Engine {
 	//r.Use(middleware.JwtAuth())
 	//================== 系统相关 =====================
 	// 加载静态资源
-	r.Static("/asset", "assert/")
+	r.Static("/asset", "asset/")
+	r.StaticFile("/favicon.ico", "asset/images/favicon.ico")
 	r.LoadHTMLGlob("views/**/*")
 	defaultGroup := r.Group("/")
 	{
 		defaultGroup.GET("/", service.GetIndex)
 		defaultGroup.GET("index", service.GetIndex)
+		defaultGroup.GET("/toRegister", service.ToRegister)
+		defaultGroup.GET("/toChat", service.ToChat)
+		defaultGroup.GET("/chat", service.Chat)
+		//defaultGroup.POST("/searchFriends", service.SearchFriends)
 	}
 	//================== swagger相关 =====================
 	// 设置docs文件相对路径
 	docs.SwaggerInfo.BasePath = ""
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	//================== 不需要验证token ===============
+	defaultGroup.POST("/login", service.Login)
+	defaultGroup.POST("/createUser", service.CreateUser)
 	//================== 用户相关 =====================
 	// 用户路由组 ，处理用户相关请求
 	u1 := r.Group("/user")
+	// 不需要验证token
+	// 需要验证token
+	u1.Use(middleware.JwtAuth())
 	{
 		// 查询相关
 		{
@@ -42,13 +54,13 @@ func Router() *gin.Engine {
 		}
 		// 修改相关
 		{
-			u1.POST("/register", service.CreateUser)
+			//u1.POST("/createUser", service.CreateUser)
 			u1.POST("/delOne", service.DelOne)
 			u1.POST("/update", service.Update)
 		}
 		// 业务功能
 		{
-			u1.POST("/login", service.Login)
+			//u1.POST("/login", service.Login)
 		}
 		// ws相关
 		{

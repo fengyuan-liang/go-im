@@ -4,9 +4,9 @@ import (
 	"flag"
 	"go-im/config"
 	"go-im/pkg/commands"
+	"go-im/pkg/common/xgin"
+	"go-im/pkg/common/xmysql"
 	"go-im/pkg/common/xredis"
-	"go-im/pkg/xgin"
-	"go-im/pkg/xmysql"
 )
 
 // @Description: 启动类

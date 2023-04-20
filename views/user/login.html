@@ -15,7 +15,7 @@
         <form id='login-form' class="mui-input-group">
             <div class="mui-input-row">
                 <label>账号</label>
-                <input v-model="user.mobile" placeholder="请输入手机号" type="text" class="mui-input-clear mui-input">
+                <input v-model="user.name" placeholder="请输入手机号" type="text" class="mui-input-clear mui-input">
             </div>
             <div class="mui-input-row">
                 <label>密码</label>
@@ -40,7 +40,7 @@
         data: function () {
             return {
                 user: {
-                    mobile: "",
+                    name: "",
                     passwd: ""
                 }
             }
@@ -50,13 +50,11 @@
                 //检测手机号是否正确
                 console.log("login")
                 //检测密码是否为空
-
                 //网络请求
-                //封装了promis
-                util.post("user/login", this.user).then(res => {
+                util.postJSON("user/login", this.user).then(res => {
                     console.log(res)
                     if (res.code != 0) {
-                        mui.toast(res.msg)
+                        mui.toast(res.message)
                     } else {
                         var url = "/chat/index.shtml?id=" + res.data.id
                             + "&token=" + res.data.token

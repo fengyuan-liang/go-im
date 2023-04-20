@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go-im/common/entity/response"
 	"go-im/models"
+	"go-im/repository"
 	"go-im/service/handle/loginHanle"
 	"go-im/utils"
 	"gorm.io/gorm"
@@ -77,6 +78,12 @@ func PageQueryByFilter(c *gin.Context) {
 	})))
 }
 
+type UserParams struct {
+	Name       string `json:"name" validate:"required" reg_error_info:"姓名不能为空"`
+	Password   string `json:"password" gorm:"column:password" json:"password"`
+	RePassword string `json:"Identity" validate:"eqfield=Password" reg_error_info:"两次密码不一样"`
+}
+
 // CreateUser 创建一个用户
 // @Tags 创建一个用户
 // @BasePath /user
@@ -86,13 +93,9 @@ func PageQueryByFilter(c *gin.Context) {
 // @Success 200 {UserBasic} []*UserBasic
 // @Router /user/register [post]
 func CreateUser(c *gin.Context) {
-	type UserParams struct {
-		models.UserBasic
-		RePassword string `validate:"eqfield=Password" reg_error_info:"两次密码不一样"`
-	}
 	userParams := &UserParams{}
 	if err := c.BindJSON(userParams); err != nil {
-		c.JSON(-1, response.Err.WithMsg("参数有误，err:"+err.Error()))
+		c.JSON(-1, response.AppErr.WithMsg("参数有误，err:"+err.Error()))
 		return
 	}
 	// 参数校验
@@ -109,11 +112,11 @@ func CreateUser(c *gin.Context) {
 		c.JSON(-1, response.AppErr.WithMsg("用户名已注册"))
 		return
 	}
-	userByPhone := models.FindUserByPhone(userParams.PhoneNum)
-	if userByPhone.PhoneNum != "" {
-		c.JSON(-1, response.AppErr.WithMsg("手机号已注册"))
-		return
-	}
+	//userByPhone := models.FindUserByPhone(userParams.PhoneNum)
+	//if userByPhone.PhoneNum != "" {
+	//	c.JSON(-1, response.AppErr.WithMsg("手机号已注册"))
+	//	return
+	//}
 	userBasic := &models.UserBasic{}
 	err := utils.Copy(userParams).To(userBasic)
 	if err != nil {
@@ -126,7 +129,7 @@ func CreateUser(c *gin.Context) {
 	userBasic.Salt = salt
 	userBasic.Password = utils.EncodeBySalt(userBasic.Password, salt)
 	// 插入数据
-	models.InsetOne(userBasic)
+	repository.GetUserRepo().AddOrModify(userBasic)
 	c.JSON(200, response.Ok)
 }
 
@@ -198,6 +201,8 @@ func Login(c *gin.Context) {
 	if userBasic, err := loginHanle.LoginBySign(params.LoginSign, parseMap); err != nil {
 		c.JSON(-1, response.AppErr.WithMsg(err.ErrorMsg()))
 	} else {
+		// 生成token
+
 		c.JSON(200, response.Ok.WithData(userBasic))
 	}
 }

@@ -7,7 +7,7 @@
 package orm
 
 import (
-	"go-im/pkg/xmysql"
+	"go-im/pkg/common/xmysql"
 	"go-im/utils"
 	"gorm.io/gorm"
 	"reflect"
@@ -17,7 +17,7 @@ type BaseEntity struct {
 	Id uint64
 }
 
-type IBaseRepository[T any] interface {
+type IBaseRepository[T BaseEntity | gorm.Model] interface {
 	AddOrModify(t *T) error
 	FindById(id interface{}) (t *T, err error)
 	List(pageNo int, pageSize int) (*[]T, error)
@@ -65,9 +65,15 @@ func (repo *BaseRepository[T]) ListByFilter(pageNo int, pageSize int, filter fun
 }
 
 func (repo *BaseRepository[T]) AddOrModify(t *T) error {
+	// 获取到值为止
+	modelType := reflect.ValueOf(t)
+	// 获取到值为止
+	for modelType.Kind() == reflect.Slice || modelType.Kind() == reflect.Array || modelType.Kind() == reflect.Ptr {
+		modelType = modelType.Elem()
+	}
 	// 好像不能通过泛型获取字段，只能反射了
-	v := reflect.ValueOf(t).FieldByName("Id")
-	if t, err := repo.FindById(v.Int()); err == nil {
+	v := modelType.FieldByName("ID")
+	if t, err := repo.FindById(v.Interface().(uint)); err == nil {
 		// 修改，拿到改变了的字段
 		return xmysql.DB.Updates(t).Error
 	}

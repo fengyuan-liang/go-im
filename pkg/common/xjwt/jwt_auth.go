@@ -18,7 +18,7 @@ const (
 )
 
 // CreateToken access表示是否为访问token，这里分为访问token和刷新token
-func CreateToken(uid int64, platform int32, access bool, expiresIn int) (t *JwtToken, err error) {
+func CreateToken(uid int64, platform constant.PlatformType, access bool, expiresIn int) (t *JwtToken, err error) {
 	t = new(JwtToken)
 	var (
 		token     *jwt.Token
@@ -119,7 +119,7 @@ func Decode(in string) (t *JwtToken, err error) {
 		case constant.USER_PLATFORM:
 			switch value.(type) {
 			case float64:
-				t.Platform = int32(value.(float64))
+				t.Platform = constant.PlatformType(value.(float64))
 			}
 		}
 	}

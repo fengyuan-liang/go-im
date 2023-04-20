@@ -5,3 +5,10 @@ const (
 	JWT_TOKEN_SECRET_KEY = "lark_jwt_token_2022"
 	JWT_PREFIX           = "jwt="
 )
+
+type PlatformType int32
+
+const (
+	ANDROID PlatformType = iota
+	IOS
+)
