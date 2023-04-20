@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"time"
+	"html/template"
 )
 
 // @Description:
@@ -11,7 +11,9 @@ import (
 // @Author: fengyuan-liang@foxmail.com
 
 func GetIndex(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "hello,time is " + time.Now().String(),
-	})
+	files, err := template.ParseFiles("index.html")
+	if err != nil {
+		panic(err)
+	}
+	files.Execute(c.Writer, "index")
 }

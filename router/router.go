@@ -19,8 +19,12 @@ func Router() *gin.Engine {
 	// jwt鉴权
 	//r.Use(middleware.JwtAuth())
 	//================== 系统相关 =====================
+	// 加载静态资源
+	r.Static("/asset", "assert/")
+	r.LoadHTMLGlob("views/**/*")
 	defaultGroup := r.Group("/")
 	{
+		defaultGroup.GET("/", service.GetIndex)
 		defaultGroup.GET("index", service.GetIndex)
 	}
 	//================== swagger相关 =====================
