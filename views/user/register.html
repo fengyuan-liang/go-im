@@ -58,14 +58,14 @@
                 //检测密码是否为空
                 console.log(this.user)
                 //封装了promis
-                util.postJSON("/user/createUser", this.user).then(res => {
+                util.postJSON("/createUser", this.user).then(res => {
                     console.log(res)
                     if (res.code !== 200) {
                         mui.toast(res.message)
                     } else {
                         //location.replace("localhost:8081")
-                        location.href = "/"
                         mui.toast("注册成功,即将跳转")
+                        location.href = "/"
                     }
                 })
             },

@@ -51,7 +51,7 @@ func ProcessErr(u interface{}, err error) string {
 		fieldName := validationErr.Field() //获取是哪个字段不符合格式
 		typeOf := reflect.TypeOf(u)
 		// 如果是指针，获取其属性
-		if typeOf.Kind() == reflect.Ptr {
+		for typeOf.Kind() == reflect.Ptr {
 			typeOf = typeOf.Elem()
 		}
 		field, ok := typeOf.FieldByName(fieldName) //通过反射获取filed

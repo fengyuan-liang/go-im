@@ -31,7 +31,7 @@ func Router() *gin.Engine {
 		defaultGroup.GET("/toRegister", service.ToRegister)
 		defaultGroup.GET("/toChat", service.ToChat)
 		defaultGroup.GET("/chat", service.Chat)
-		//defaultGroup.POST("/searchFriends", service.SearchFriends)
+		defaultGroup.POST("/searchFriends", service.SearchFriends)
 	}
 	//================== swagger相关 =====================
 	// 设置docs文件相对路径

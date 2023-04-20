@@ -6,6 +6,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go-im/common/entity/response"
 	"go-im/models"
+	"go-im/pkg/common/xjwt"
+	"go-im/pkg/constant"
 	"go-im/repository"
 	"go-im/service/handle/loginHanle"
 	"go-im/utils"
@@ -18,6 +20,14 @@ import (
 // @Version: 1.0.0
 // @Date: 2023/01/28 14:43
 // @Author: fengyuan-liang@foxmail.com
+
+var (
+	userValidate = validator.New()
+)
+
+func init() {
+	userValidate.RegisterValidation("RegexPhone", utils.RegexPhone)
+}
 
 // PageQueryUserList 分页查询
 // @Tags 用户相关
@@ -98,11 +108,7 @@ func CreateUser(c *gin.Context) {
 		c.JSON(-1, response.AppErr.WithMsg("参数有误，err:"+err.Error()))
 		return
 	}
-	// 参数校验
-	validate := validator.New()
-	// 自定义校验
-	validate.RegisterValidation("RegexPhone", utils.RegexPhone)
-	if err := validate.Struct(userParams); err != nil {
+	if err := userValidate.Struct(userParams); err != nil {
 		c.JSON(-1, response.AppErr.WithMsg(utils.ProcessErr(userParams, err)))
 		return
 	}
@@ -133,6 +139,11 @@ func CreateUser(c *gin.Context) {
 	c.JSON(200, response.Ok)
 }
 
+type DelOneParams struct {
+	UserId     uint64 `json:"userId"`
+	IsLogicDel bool   `json:"isLogicDel"`
+}
+
 // DelOne 删除一个用户
 // @Tags 删除一个用户
 // @Summary 参数类型：{"userId":123456,"isLogicDel":true}
@@ -141,11 +152,7 @@ func CreateUser(c *gin.Context) {
 // @Success 200 {UserBasic} []*UserBasic
 // @Router /user/delOne [post]
 func DelOne(c *gin.Context) {
-	type Params struct {
-		UserId     uint64 `json:"userId"`
-		IsLogicDel bool   `json:"isLogicDel"`
-	}
-	params := &Params{}
+	params := &DelOneParams{}
 	if err := c.BindJSON(params); err != nil || params.UserId <= 0 {
 		c.JSON(500, response.Err.WithMsg("参数缺失"))
 		return
@@ -175,24 +182,29 @@ func Update(c *gin.Context) {
 	c.JSON(200, response.Ok)
 }
 
+type loginVO struct {
+	models.UserBasic
+	Token string `json:"token"`
+}
+
+type LoginParams struct {
+	Name      string `validate:"required" reg_error_info:"姓名不能为空" json:"name"`
+	Password  string `validate:"required" reg_error_info:"密码不能为空" json:"password"`
+	LoginSign string `validate:"required" reg_error_info:"登录标识不能为空" json:"loginSign"`
+}
+
 // Login 通用登录接口
 // @Tags 通用登录接口
 // @Param param body models.UserBasic true "上传的JSON"
 // @Produce json
 // @Router /user/login [post]
 func Login(c *gin.Context) {
-	type Params struct {
-		Name      string `validate:"required" reg_error_info:"姓名不能为空" json:"name"`
-		Password  string `validate:"required" reg_error_info:"密码不能为空" json:"password"`
-		LoginSign string `validate:"required" reg_error_info:"登录标识不能为空" json:"loginSign"`
-	}
-	params := &Params{}
+	params := &LoginParams{}
 	if err := c.BindJSON(params); err != nil {
 		c.JSON(-1, response.Err.WithMsg("参数有误，err:"+err.Error()))
 		return
 	}
-	validate := validator.New()
-	if err := validate.Struct(params); err != nil {
+	if err := userValidate.Struct(params); err != nil {
 		c.JSON(-1, response.AppErr.WithMsg(utils.ProcessErr(params, err)))
 		return
 	}
@@ -201,8 +213,11 @@ func Login(c *gin.Context) {
 	if userBasic, err := loginHanle.LoginBySign(params.LoginSign, parseMap); err != nil {
 		c.JSON(-1, response.AppErr.WithMsg(err.ErrorMsg()))
 	} else {
+		vo := &loginVO{}
+		utils.Copy(userBasic).To(vo)
 		// 生成token
-
-		c.JSON(200, response.Ok.WithData(userBasic))
+		jwtToken, _ := xjwt.CreateToken(int64(userBasic.UserId), constant.ANDROID, false, constant.CONST_DURATION_SHA_JWT_ACCESS_TOKEN_EXPIRE_IN_SECOND)
+		vo.Token = jwtToken.Token
+		c.JSON(200, response.Ok.WithData(vo))
 	}
 }

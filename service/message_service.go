@@ -12,8 +12,8 @@ import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 	"go-im/models"
+	"go-im/pkg/common/xlog"
 	"go-im/pkg/entity/vo"
 	"io"
 	"net"
@@ -58,7 +58,7 @@ func Chat(ctx *gin.Context) {
 		},
 	}).Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		logrus.Panicf("chat websocket panic， err[%v]", err.Error())
+		xlog.Panicf("chat websocket panic， err[%v]", err.Error())
 	}
 	// 2. 获取连接
 	node = &Node{
@@ -97,11 +97,11 @@ func recvMessageTask(node *Node) {
 	for {
 		_, data, err := node.Conn.ReadMessage()
 		if err != nil {
-			logrus.Error(err)
+			xlog.Error(err)
 			return
 		}
 		broadMsg(data)
-		logrus.Infof("[ws] receive message[%v]", data)
+		xlog.Infof("[ws] receive message[%v]", string(data))
 	}
 }
 
@@ -116,14 +116,14 @@ func udpSendProc() {
 	})
 	defer CloseConn(conn)
 	if err != nil {
-		logrus.Error(err)
+		xlog.Error(err)
 	}
 	for {
 		select {
 		case data := <-udpSendChan:
 			_, err = conn.Write(data)
 			if err != nil {
-				logrus.Error(err)
+				xlog.Error(err)
 			}
 		}
 	}
@@ -136,14 +136,14 @@ func udpRecvProc() {
 		Port: 3000,
 	})
 	if err != nil {
-		logrus.Error(err)
+		xlog.Error(err)
 	}
 	defer CloseConn(udpConn)
 	for {
 		buffer := make([]byte, 512)
 		offset, err := udpConn.Read(buffer[0:])
 		if err != nil {
-			logrus.Error(err)
+			xlog.Error(err)
 			return
 		}
 		dispatch(buffer[0:offset])
@@ -162,7 +162,7 @@ func dispatch(data []byte) {
 	case models.BROADCASE_CHAT:
 		sendBroadCastChat(msg)
 	default:
-		logrus.Errorf("no match type[%v]", msg.Type)
+		xlog.Errorf("no match type[%v]", msg.Type)
 	}
 
 }
@@ -185,18 +185,18 @@ func sendMsg(targetId uint64, msg []byte) {
 	if node, ok := clientMap[targetId]; ok {
 		node.DataQueue <- msg
 	} else {
-		logrus.Errorf("have no websocket connection, targetId[%v]", targetId)
+		xlog.Errorf("have no websocket connection, targetId[%v]", targetId)
 	}
 	sendMsgLock.Unlock()
 }
 
 func CloseConn(closer io.Closer) {
 	if closer == nil {
-		logrus.Error("resource is close")
+		xlog.Error("resource is close")
 		return
 	}
 	err := closer.Close()
 	if err != nil {
-		logrus.Errorf("failed to close resource, err[%v]", err.Error())
+		xlog.Errorf("failed to close resource, err[%v]", err.Error())
 	}
 }

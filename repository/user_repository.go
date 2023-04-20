@@ -8,6 +8,7 @@ package repository
 
 import (
 	"go-im/models"
+	"go-im/pkg/common/xmysql"
 	"go-im/pkg/orm"
 )
 
@@ -26,4 +27,9 @@ func GetUserRepo() *UserRepository {
 		userRepository = NewUserRepository()
 	}
 	return userRepository
+}
+
+func (u *UserRepository) FindByUserId(userId uint64) (user *models.UserBasic, err error) {
+	err = xmysql.GetDB().Where("userId = ?", userId).First(user).Error
+	return
 }

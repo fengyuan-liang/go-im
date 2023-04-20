@@ -51,14 +51,15 @@
                 // 登陆策略，使用账号密码登陆
                 this.user.loginSign = "ACCOUNT_PWD_LOGIN_STRATEGY"
                 //封装了promis
-                util.postJSON("user/login", this.user).then(res => {
+                util.postJSON("login", this.user).then(res => {
                     console.log(res)
-                    if (res.code != 0) {
+                    if (res.code !== 200) {
                         mui.toast(res.message)
                     } else {
                         var url = "/toChat?userId=" + res.data.ID + "&token=" + res.data.Identity
                         userInfo(res.data)
                         userId(res.data.ID)
+                        Token(res.data.token)
                         mui.toast("登录成功,即将跳转")
                         location.href = url
                     }

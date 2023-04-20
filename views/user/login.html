@@ -51,12 +51,12 @@
                 console.log("login")
                 //检测密码是否为空
                 //网络请求
-                util.postJSON("user/login", this.user).then(res => {
+                util.postJSON("login", this.user).then(res => {
                     console.log(res)
-                    if (res.code != 0) {
+                    if (res.code !== 0) {
                         mui.toast(res.message)
                     } else {
-                        var url = "/chat/index.shtml?id=" + res.data.id
+                        var url = "/chat/index.html?id=" + res.data.id
                             + "&token=" + res.data.token
                         userInfo(res.data)
                         userId(res.data.id)

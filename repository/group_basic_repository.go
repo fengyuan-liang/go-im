@@ -8,10 +8,19 @@ package repository
 
 import "go-im/pkg/orm"
 
+var groupBasicRepo *GroupBasicRepository
+
 type GroupBasicRepository struct {
 	*orm.BaseRepository[GroupBasicRepository]
 }
 
 func NewGroupBasicRepository() *GroupBasicRepository {
 	return &GroupBasicRepository{}
+}
+
+func GetGroupRepo() *GroupBasicRepository {
+	if groupBasicRepo == nil {
+		groupBasicRepo = NewGroupBasicRepository()
+	}
+	return groupBasicRepo
 }
