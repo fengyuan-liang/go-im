@@ -5,6 +5,7 @@ import (
 )
 
 type MessageType int
+type Extends map[string]interface{}
 
 const (
 	SINGLE_CHAT MessageType = iota
@@ -21,7 +22,7 @@ type Message struct {
 	ContentType int         `gorm:"column:content_type" json:"content_type"`         // 消息类型 图片 广播 文字
 	Avatar      string      `gorm:"column:avatar;type:varchar(100)" json:"avatar"`
 	Desc        string      `gorm:"column:desc;type:varchar(200)" json:"desc"`
-	Amount      int         `gorm:"column:amount;type:int" json:"amount"` // 其他数字统计
+	Extends     Extends     `gorm:"column:extends;type:varchar(200)" json:"extends"` // 其他数字统计
 }
 
 // TableName 用户表名
