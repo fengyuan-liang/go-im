@@ -16,22 +16,22 @@ import (
 // UserBasic 用户基础属性表
 type UserBasic struct {
 	gorm.Model    `json:"-"`
-	UserId        uint64    `gorm:"column:user_id" json:"userId"`
-	UserNumber    string    `gorm:"column:user_number" json:"userNumber"`
-	Name          string    `json:"name" validate:"required" reg_error_info:"姓名不能为空"`
-	Age           uint8     `json:"age" validate:"gt=0,lt=200" reg_error_info:"年龄不合法"`
-	Password      string    `json:"password" gorm:"column:password" json:"password"`
-	PhoneNum      string    `json:"phone_number" validate:"RegexPhone" reg_error_info:"手机号格式不正确"`
-	Email         string    `json:"email" validate:"email" reg_error_info:"email为空或格式不正确"`
-	Identity      uint8     `gorm:"column:identity" json:"identity"`
-	ClientIp      string    `gorm:"column:client_ip" json:"client_ip"`
-	ClientPort    string    `gorm:"column:client_port" json:"client_port"`
-	LoginTime     time.Time `gorm:"column:login_time" json:"login_time"`
-	HeartBeatTime uint64    `gorm:"column:heart_beat_time" son:"heart_beat_time"`
-	LogOutTime    uint64    `gorm:"column:logout_time" json:"logout_time" json:"logout_time"`
-	IsLogin       bool      `gorm:"column:is_login" json:"is_login"`
-	DeviceInfo    string    `gorm:"column:device_info" json:"device_info"` // 登陆设备信息
-	Salt          string    `gorm:"column:salt" json:"salt"`               // md5的盐
+	UserId        uint64     `gorm:"column:user_id" json:"userId"`
+	UserNumber    string     `gorm:"column:user_number" json:"userNumber"`
+	Name          string     `json:"name" validate:"required" reg_error_info:"姓名不能为空"`
+	Age           uint8      `json:"age" validate:"gt=0,lt=200" reg_error_info:"年龄不合法"`
+	Password      string     `json:"password" gorm:"column:password" json:"password"`
+	PhoneNumber   string     `bson:"column:phone_number" json:"phone_number" validate:"RegexPhone" reg_error_info:"手机号格式不正确"`
+	Email         string     `json:"email" validate:"email" reg_error_info:"email为空或格式不正确"`
+	Identity      string     `gorm:"column:identity" json:"identity"`
+	ClientIp      string     `gorm:"column:client_ip" json:"client_ip"`
+	ClientPort    string     `gorm:"column:client_port" json:"client_port"`
+	LoginTime     *time.Time `gorm:"column:login_time" json:"login_time"`
+	HeartBeatTime *time.Time `gorm:"column:heart_beat_time" son:"heart_beat_time"`
+	LogOutTime    *time.Time `gorm:"column:logout_time" json:"logout_time" json:"logout_time"`
+	IsLogin       bool       `gorm:"column:is_login" json:"is_login"`
+	DeviceInfo    string     `gorm:"column:device_info" json:"device_info"` // 登陆设备信息
+	Salt          string     `gorm:"column:salt" json:"salt"`               // md5的盐
 }
 
 // TableName 用户表名

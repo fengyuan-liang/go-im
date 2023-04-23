@@ -91,7 +91,7 @@ func PageQueryByFilter(c *gin.Context) {
 type UserParams struct {
 	Name       string `json:"name" validate:"required" reg_error_info:"姓名不能为空"`
 	Password   string `json:"password" gorm:"column:password" json:"password"`
-	RePassword string `json:"Identity" validate:"eqfield=Password" reg_error_info:"两次密码不一样"`
+	RePassword string `json:"rePassword" validate:"eqfield=Password" reg_error_info:"两次密码不一样"`
 }
 
 // CreateUser 创建一个用户

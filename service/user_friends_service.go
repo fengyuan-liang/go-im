@@ -38,6 +38,7 @@ func AddFriend(c *gin.Context) {
 	contact := &models.Contact{}
 	if err = c.BindJSON(contact); err != nil {
 		c.JSON(-1, response.Err.WithMsg("参数有误，err:"+err.Error()))
+		return
 	}
 	if err = validate.Struct(contact); err != nil {
 		c.JSON(-1, response.AppErr.WithMsg(utils.ProcessErr(contact, err)))
